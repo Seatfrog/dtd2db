@@ -1,23 +1,31 @@
-![npm](https://img.shields.io/npm/v/dtd2db.svg?style=flat-square) ![npm](https://img.shields.io/npm/dw/dtd2db.svg?style=flat-square) 
-
+# DTD2DB
 
 An import tool for the British rail fares, routeing and timetable feeds into a database.
 
 Although both the timetable and fares feed are open data you will need to obtain the fares feed via the [ATOC website](http://data.atoc.org/fares-data). The formal specification for the data inside the feed also available on the [ATOC website](http://data.atoc.org/sites/all/themes/atoc/files/SP0035.pdf).
 
-The tool supports both MySQL and Snowflake databases. PRs are very welcome.
+The tool supports both MySQL and Snowflake databases.
 
 ## Download / Install
 
-### Option 1: Install from npm (Public, if we ever publish this)
-You don't have to install it globally but it makes it easier if you are not going to use it as part of another project. The `-g` option usually requires `sudo`. It is not necessary to git clone this repository unless you would like to contribute.
+### Option 1: Install from Private Repository
 
+```bash
+npm install git+https://github.com/seatfrog/dtd2db.git
 ```
-npm install -g dtd2db
+
+Or add to your package.json:
+```json
+{
+  "dependencies": {
+    "dtd2db": "github:seatfrog/dtd2db"
+  }
+}
 ```
+
+This will install the `dtd2db` command, which can be used with either MySQL or Snowflake databases by setting the `DATABASE_TYPE` environment variable.
 
 ### Option 2: Install Locally
-To use this package in your project without publishing to npm:
 
 1. Clone the repository:
 ```bash
@@ -28,7 +36,6 @@ cd dtd2db
 2. Install dependencies and build:
 ```bash
 npm install
-npm run prepublishOnly
 ```
 
 3. Link it locally (optional, for development):
@@ -50,23 +57,6 @@ npm link
      npm install /path/to/dtd2db
      ```
 
-### Option 3: Install from Private Repository
-If you have a private repository (e.g., GitHub private repo), you can install directly from there:
-
-```bash
-npm install git+https://github.com/seatfrog/dtd2db.git
-```
-
-Or add to your package.json:
-```json
-{
-  "dependencies": {
-    "dtd2db": "github:seatfrog/dtd2db"
-  }
-}
-```
-
-This will install the `dtd2db` command, which can be used with either MySQL or Snowflake databases by setting the `DATABASE_TYPE` environment variable.
 
 ## Database Configuration
 
@@ -95,9 +85,12 @@ SNOWFLAKE_WAREHOUSE=your_warehouse
 SNOWFLAKE_ROLE=your_role
 ```
 
+# Usage
+
+All commands rely on the DATABASE-TYPE env var being set.
+
 ## Fares 
 
-Each command relies on the database settings being set in the environment variables.
 ```
 dtd2db --fares-clean
 ```
@@ -193,20 +186,17 @@ The timetable data does not map to a relational database in a very logical fashi
 Only schedule records that **start** up to 3 months into the future (using date of import as a reference point) are exported to GTFS for performance reasons.
 This will cause any data after that point to be either incomplete or incorrect, as override/cancellation records after that will be ignored as well.
 
-## Contributing
-
-Issues and PRs are very welcome. To get the project set up run
+## Dev and Testing
 
 ```
-git clone git@github.com:planarnetwork/dtd2db
+git clone git@github.com:seatfrog/dtd2db
 npm install --dev
 npm test
 ```
-
-If you would like to send a pull request please write your contribution in TypeScript and if possible, add a test.
 
 ## License
 
 This software is licensed under [GNU GPLv3](https://www.gnu.org/licenses/gpl-3.0.en.html).
 
 Copyright 2017 Linus Norton.
+
