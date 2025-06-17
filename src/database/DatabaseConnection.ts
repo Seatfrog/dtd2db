@@ -1,18 +1,23 @@
 
 export interface DatabaseConnection {
-  getConnection(): Promise<DatabaseConnection>;
-  query<RowType = unknown>(sql: any, parameters?: any[]): Promise<[RowType[], any]>;
+  type: "mysql" | "snowflake";
+  query<RowType = unknown>(sql: string, parameters?: any[]): Promise<[RowType[], any]>;
+  stream(sql: string): Promise<any>;
   end(): Promise<void>;
+  getConnection(): Promise<DatabaseConnection>;
   release(): Promise<void>;
 }
 
 export interface DatabaseConfiguration {
-  host: string,
-  user: string,
-  password: string | null,
-  database: string,
-  connectionLimit: number,
-  multipleStatements: boolean,
-  port: number,
-  promise?: any
+  host: string;
+  user: string;
+  password?: string | null;
+  privateKeyPath?: string;
+  database: string;
+  port: number;
+  connectionLimit: number;
+  multipleStatements: boolean;
+  schema?: string;
+  warehouse?: string;
+  role?: string;
 }

@@ -1,30 +1,75 @@
-import * as memoize from "memoized-class-decorator";
+import memoize from "memoized-class-decorator";
 import * as fs from 'node:fs';
 import * as os from 'node:os';
 import * as path from 'node:path';
-import {CLICommand} from "./CLICommand";
-import {ImportFeedCommand} from "./ImportFeedCommand";
-import {DatabaseConfiguration, DatabaseConnection} from "../database/DatabaseConnection";
-import config from "../../config";
-import {CleanFaresCommand} from "./CleanFaresCommand";
-import {ShowHelpCommand} from "./ShowHelpCommand";
-import {OutputGTFSCommand} from "./OutputGTFSCommand";
-import {CIFRepository} from "../gtfs/repository/CIFRepository";
-import {stationCoordinates} from "../../config/gtfs/station-coordinates";
-import {FileOutput} from "../gtfs/output/FileOutput";
-import {GTFSOutput} from "../gtfs/output/GTFSOutput";
-import {OutputGTFSZipCommand} from "./OutputGTFSZipCommand";
-import {DownloadCommand} from "./DownloadCommand";
-import {DownloadAndProcessCommand} from "./DownloadAndProcessCommand";
-import {GTFSImportCommand} from "./GTFSImportCommand";
-import {downloadUrl} from "../../config/nfm64";
-import {DownloadFileCommand} from "./DownloadFileCommand";
-import {PromiseSFTP} from "../sftp/PromiseSFTP";
+import {CLICommand} from "@cli/CLICommand";
+import {ImportFeedCommand} from "@cli/ImportFeedCommand";
+import {DatabaseConfiguration, DatabaseConnection} from "@database/DatabaseConnection";
+import config from "@config/index";
+import {CleanFaresCommand} from "@cli/CleanFaresCommand";
+import {ShowHelpCommand} from "@cli/ShowHelpCommand";
+import {OutputGTFSCommand} from "@cli/OutputGTFSCommand";
+import {CIFRepository} from "@gtfs/repository/CIFRepository";
+import {stationCoordinates} from "@config/gtfs/station-coordinates";
+import {FileOutput} from "@gtfs/output/FileOutput";
+import {GTFSOutput} from "@gtfs/output/GTFSOutput";
+import {OutputGTFSZipCommand} from "@cli/OutputGTFSZipCommand";
+import {DownloadCommand} from "@cli/DownloadCommand";
+import {DownloadAndProcessCommand} from "@cli/DownloadAndProcessCommand";
+import {GTFSImportCommand} from "@cli/GTFSImportCommand";
+import {downloadUrl} from "@config/nfm64";
+import {DownloadFileCommand} from "@cli/DownloadFileCommand";
+import {PromiseSFTP} from "@src/sftp/PromiseSFTP";
+import {SnowflakeDatabaseCommand} from "@cli/SnowflakeDatabaseCommand";
+import {MySQLDatabaseCommand} from "@cli/MySQLDatabaseCommand";
+import {SnowflakeConnection} from "@database/SnowflakeConnection";
+import {SnowflakeGTFSImportCommand} from "@cli/SnowflakeGTFSImportCommand";
+import {SnowflakeImportFeedCommand} from "@cli/SnowflakeImportFeedCommand";
+import {SnowflakeCleanFaresCommand} from "@cli/SnowflakeCleanFaresCommand";
+
+// Debug logging function
+function debugLog(message: string): void {
+  if (process.env.DEBUG) {
+    console.log(`[DEBUG] ${message}`);
+  }
+}
 
 export class Container {
+  private readonly isSnowflake: boolean;
+
+  constructor() {
+    this.isSnowflake = process.env.DATABASE_TYPE === 'snowflake';
+    if (this.isSnowflake) {
+      this.validateSnowflakeConfig();
+    }
+  }
+
+  private validateSnowflakeConfig(): void {
+    const requiredVars = [
+      'SNOWFLAKE_ACCOUNT',
+      'SNOWFLAKE_USERNAME',
+      'SNOWFLAKE_PRIVATE_KEY_PATH',
+      'DATABASE_NAME',
+      'SNOWFLAKE_SCHEMA',
+      'SNOWFLAKE_WAREHOUSE',
+      'SNOWFLAKE_ROLE'
+    ];
+
+    const missingVars = requiredVars.filter(varName => !process.env[varName]);
+    
+    if (missingVars.length > 0) {
+      throw new Error(`Missing required Snowflake environment variables: ${missingVars.join(', ')}`);
+    }
+
+    // Validate warehouse exists
+    if (!process.env.SNOWFLAKE_WAREHOUSE) {
+      throw new Error("SNOWFLAKE_WAREHOUSE environment variable is required for Snowflake connection");
+    }
+  }
 
   @memoize
   public getCommand(type: string): Promise<CLICommand> {
+    debugLog(`getCommand called with type: ${type}`);
     switch (type) {
       case "--fares": return this.getFaresImportCommand();
       case "--fares-clean": return this.getCleanFaresCommand();
@@ -48,27 +93,41 @@ export class Container {
 
   @memoize
   public async getFaresImportCommand(): Promise<ImportFeedCommand> {
+    if (this.isSnowflake) {
+      return new SnowflakeImportFeedCommand(await this.getDatabaseConnection(), config.fares, fs.mkdtempSync(path.join(os.tmpdir(), "dtd")));
+    }
     return new ImportFeedCommand(await this.getDatabaseConnection(), config.fares, fs.mkdtempSync(path.join(os.tmpdir(), "dtd")));
   }
 
   @memoize
   public async getRouteingImportCommand(): Promise<ImportFeedCommand> {
+    if (this.isSnowflake) {
+      return new SnowflakeImportFeedCommand(await this.getDatabaseConnection(), config.routeing, fs.mkdtempSync(path.join(os.tmpdir(), "dtd")));
+    }
     return new ImportFeedCommand(await this.getDatabaseConnection(), config.routeing, fs.mkdtempSync(path.join(os.tmpdir(), "dtd")));
   }
 
   @memoize
   public async getTimetableImportCommand(): Promise<ImportFeedCommand> {
+    if (this.isSnowflake) {
+      return new SnowflakeImportFeedCommand(await this.getDatabaseConnection(), config.timetable, fs.mkdtempSync(path.join(os.tmpdir(), "dtd")));
+    }
     return new ImportFeedCommand(await this.getDatabaseConnection(), config.timetable, fs.mkdtempSync(path.join(os.tmpdir(), "dtd")));
   }
 
   @memoize
   public async getNFM64ImportCommand(): Promise<ImportFeedCommand> {
+    if (this.isSnowflake) {
+      return new SnowflakeImportFeedCommand(await this.getDatabaseConnection(), config.nfm64, fs.mkdtempSync(path.join(os.tmpdir(), "dtd")));
+    }
     return new ImportFeedCommand(await this.getDatabaseConnection(), config.nfm64, fs.mkdtempSync(path.join(os.tmpdir(), "dtd")));
   }
 
-
   @memoize
   public async getCleanFaresCommand(): Promise<CLICommand> {
+    if (this.isSnowflake) {
+      return new SnowflakeCleanFaresCommand(await this.getDatabaseConnection());
+    }
     return new CleanFaresCommand(await this.getDatabaseConnection());
   }
 
@@ -78,8 +137,14 @@ export class Container {
   }
 
   @memoize
-  public getImportGTFSCommand(): Promise<GTFSImportCommand> {
-    return Promise.resolve(new GTFSImportCommand(this.databaseConfiguration));
+  public async getImportGTFSCommand(): Promise<CLICommand> {
+    if (this.isSnowflake) {
+      return new SnowflakeGTFSImportCommand(
+        await this.getDatabaseConnection(),
+        fs.mkdtempSync(path.join(os.tmpdir(), "dtd"))
+      );
+    }
+    return new GTFSImportCommand(this.databaseConfiguration);
   }
 
   @memoize
@@ -169,32 +234,55 @@ export class Container {
   }
 
   @memoize
-  public getDatabaseConnection(): DatabaseConnection {
-    return require('mysql2/promise').createPool({
-      ...this.databaseConfiguration,
-      //debug: ['ComQueryPacket', 'RowDataPacket']
-    });
-  }
-
-  @memoize
-  public getDatabaseStream() {
-    return require('mysql2').createPool(this.databaseConfiguration);
-  }
-
   public get databaseConfiguration(): DatabaseConfiguration {
     if (!process.env.DATABASE_NAME) {
       throw new Error("Please set the DATABASE_NAME environment variable.");
+    }
+
+    if (this.isSnowflake) {
+      return {
+        host: process.env.SNOWFLAKE_ACCOUNT!,
+        user: process.env.SNOWFLAKE_USERNAME!,
+        privateKeyPath: process.env.SNOWFLAKE_PRIVATE_KEY_PATH!,
+        database: process.env.DATABASE_NAME,
+        schema: process.env.SNOWFLAKE_SCHEMA!,
+        warehouse: process.env.SNOWFLAKE_WAREHOUSE!,
+        role: process.env.SNOWFLAKE_ROLE!,
+        port: 443, // Snowflake uses HTTPS
+        connectionLimit: 20,
+        multipleStatements: true
+      };
     }
 
     return {
       host: process.env.DATABASE_HOSTNAME || "localhost",
       user: process.env.DATABASE_USERNAME || "root",
       password: process.env.DATABASE_PASSWORD || null,
-      database: <string>process.env.DATABASE_NAME,
+      database: process.env.DATABASE_NAME,
       port: +(process.env.DATABASE_PORT || 3306),
       connectionLimit: 20,
       multipleStatements: true
     };
   }
 
+  @memoize
+  public getDatabaseConnection(): DatabaseConnection {
+    if (this.isSnowflake) {
+      return new SnowflakeConnection(this.databaseConfiguration);
+    }
+    return require('mysql2/promise').createPool(this.databaseConfiguration);
+  }
+
+  @memoize
+  public getDatabaseStream() {
+    return this.getDatabaseConnection();
+  }
+
+  @memoize
+  public async getDatabaseTypeCommand(): Promise<CLICommand> {
+    if (this.isSnowflake) {
+      return new SnowflakeDatabaseCommand();
+    }
+    return new MySQLDatabaseCommand();
+  }
 }
