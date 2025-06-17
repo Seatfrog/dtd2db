@@ -1,5 +1,4 @@
-
-import * as proj4 from 'proj4';
+import proj4 from 'proj4';
 import {DatabaseConnection} from "../../database/DatabaseConnection";
 import {Transfer} from "../file/Transfer";
 import {CRS, Stop} from "../file/Stop";

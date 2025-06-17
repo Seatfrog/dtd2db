@@ -1,7 +1,7 @@
 import * as chai from "chai";
-import {DatabaseConnection} from "../../src/database/DatabaseConnection";
-import {MySQLTable} from "../../src/database/MySQLTable";
-import {RecordAction} from "../../src/feed/record/Record";
+import {DatabaseConnection} from "@database/DatabaseConnection";
+import {MySQLTable} from "@database/MySQLTable";
+import {RecordAction} from "@feed/record/Record";
 
 describe("MySQLTable", () => {
 
@@ -73,6 +73,7 @@ describe("MySQLTable", () => {
 
 class MockDatabaseConnection implements DatabaseConnection {
   public readonly inserts: string[] = [];
+  public readonly type = "mysql";
 
   query(sql: string, parameters?: any[]): Promise<any> {
     this.inserts.push(sql);
@@ -92,4 +93,7 @@ class MockDatabaseConnection implements DatabaseConnection {
 
   }
 
+  stream(sql: string): Promise<any> {
+    throw new Error("Method not implemented.");
+  }
 }

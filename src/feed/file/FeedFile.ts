@@ -1,5 +1,4 @@
-
-import {Record} from "../record/Record";
+import {Record} from "@feed/record/Record";
 
 export interface FeedFile {
 

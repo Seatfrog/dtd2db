@@ -1,5 +1,3 @@
-
-
 import {DatabaseConnection} from "./DatabaseConnection";
 import {Field} from "../feed/field/Field";
 import {Record} from "../feed/record/Record";
@@ -10,8 +8,9 @@ import {DateField, NullDateField, ShortDateField} from "../feed/field/DateField"
 import {TimeField} from "../feed/field/TimeField";
 import {DoubleField} from "../feed/field/DoubleField";
 import {ForeignKeyField} from "../feed/field/ForeignKeyField";
+import {DatabaseSchema} from "./DatabaseSchema";
 
-export class MySQLSchema {
+export class MySQLSchema implements DatabaseSchema {
 
   constructor(
     private readonly db: DatabaseConnection,

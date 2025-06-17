@@ -3,13 +3,15 @@ import {MySQLTable} from "./MySQLTable";
 import {FeedFile} from "../feed/file/FeedFile";
 
 export class MySQLStream extends Writable {
+  private readonly tables: { [key: string]: MySQLTable };
 
   constructor(
     private readonly filename: string,
     private readonly file: FeedFile,
-    private readonly tables: TableIndex
+    tables: TableIndex
   ) {
     super({ decodeStrings: false });
+    this.tables = tables;
   }
 
   public async _write(line: string, encoding: string, callback: WritableCallback): Promise<void> {
@@ -41,7 +43,6 @@ export class MySQLStream extends Writable {
       callback(err);
     }
   }
-
 }
 
 export type WritableCallback = (error?: Error | null) => void;

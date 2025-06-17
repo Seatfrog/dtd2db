@@ -1,13 +1,13 @@
 import * as chai from "chai";
-import {DatabaseConnection} from "../../src/database/DatabaseConnection";
-import {MySQLSchema} from "../../src/database/MySQLSchema";
-import {FixedWidthRecord} from "../../src/feed/record/FixedWidthRecord";
-import {IntField, ZeroFillIntField} from "../../src/feed/field/IntField";
-import {TextField, VariableLengthText} from "../../src/feed/field/TextField";
-import {DateField} from "../../src/feed/field/DateField";
-import {TimeField} from "../../src/feed/field/TimeField";
-import {BooleanField} from "../../src/feed/field/BooleanField";
-import {DoubleField} from "../../src/feed/field/DoubleField";
+import {DatabaseConnection} from "@database/DatabaseConnection";
+import {MySQLSchema} from "@database/MySQLSchema";
+import {FixedWidthRecord} from "@feed/record/mysql/FixedWidthRecord";
+import {IntField, ZeroFillIntField} from "@feed/field/IntField";
+import {TextField, VariableLengthText} from "@feed/field/TextField";
+import {DateField} from "@feed/field/DateField";
+import {TimeField} from "@feed/field/TimeField";
+import {BooleanField} from "@feed/field/BooleanField";
+import {DoubleField} from "@feed/field/DoubleField";
 
 describe("MySQLSchema", () => {
   const record = new FixedWidthRecord(
@@ -49,6 +49,7 @@ describe("MySQLSchema", () => {
 
 class MockDatabaseConnection implements DatabaseConnection {
   public readonly queries: string[] = [];
+  public readonly type = "mysql";
 
   query(sql: string, parameters?: any[]): Promise<any> {
     this.queries.push(sql);
@@ -66,5 +67,9 @@ class MockDatabaseConnection implements DatabaseConnection {
 
   async release(): Promise<void> {
 
+  }
+
+  stream(sql: string): Promise<any> {
+    throw new Error("Method not implemented.");
   }
 }
