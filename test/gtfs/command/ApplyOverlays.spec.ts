@@ -1,7 +1,7 @@
 import * as chai from "chai";
-import {STP} from "../../../src/gtfs/native/OverlayRecord";
-import {applyOverlays} from "../../../src/gtfs/command/ApplyOverlays";
-import {mergeSchedules} from "../../../src/gtfs/command/MergeSchedules";
+import {STP} from "@gtfs/native/OverlayRecord";
+import {applyOverlays} from "@gtfs/command/ApplyOverlays";
+import {mergeSchedules} from "@gtfs/command/MergeSchedules";
 import {schedule} from "./MergeSchedules.spec";
 
 describe("ApplyOverlays", () => {

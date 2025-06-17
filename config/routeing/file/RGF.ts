@@ -1,10 +1,10 @@
-import {CSVRecord} from "../../../src/feed/record/CSVRecord";
-import {TextField, VariableLengthText} from "../../../src/feed/field/TextField";
-import {IntField} from "../../../src/feed/field/IntField";
-import {DateField} from "../../../src/feed/field/DateField";
-import {MultiRecordFile} from "../../../src/feed/file/MultiRecordFile";
-import {FixedWidthRecord} from "../../../src/feed/record/FixedWidthRecord";
-import {BooleanField} from "../../../src/feed/field/BooleanField";
+import {CSVRecord} from "@feed/record/mysql/CSVRecord";
+import {TextField, VariableLengthText} from "@feed/field/TextField";
+import {IntField} from "@feed/field/IntField";
+import {DateField} from "@feed/field/DateField";
+import {MultiRecordFile} from "@feed/file/MultiRecordFile";
+import {FixedWidthRecord} from "@feed/record/mysql/FixedWidthRecord";
+import {BooleanField} from "@feed/field/BooleanField";
 
 const easement = new FixedWidthRecord(
   "easement",

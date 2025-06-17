@@ -1,8 +1,7 @@
-
-import {CSVRecord} from "../../../src/feed/record/CSVRecord";
-import {SingleRecordFile} from "../../../src/feed/file/SingleRecordFile";
-import {TextField} from "../../../src/feed/field/TextField";
-import {DoubleField} from "../../../src/feed/field/DoubleField";
+import {CSVRecord} from "@feed/record/mysql/CSVRecord";
+import {SingleRecordFile} from "@feed/file/SingleRecordFile";
+import {TextField} from "@feed/field/TextField";
+import {DoubleField} from "@feed/field/DoubleField";
 
 const record = new CSVRecord(
   "station_link",

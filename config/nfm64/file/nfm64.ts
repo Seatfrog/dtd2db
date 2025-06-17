@@ -1,7 +1,7 @@
-import {IntField} from "../../../src/feed/field/IntField";
-import {TextField} from "../../../src/feed/field/TextField";
-import {FixedWidthRecord} from "../../../src/feed/record/FixedWidthRecord";
-import {SingleRecordFile} from "../../../src/feed/file/SingleRecordFile";
+import {IntField} from "@feed/field/IntField";
+import {TextField} from "@feed/field/TextField";
+import {FixedWidthRecord} from "@feed/record/mysql/FixedWidthRecord";
+import {SingleRecordFile} from "@feed/file/SingleRecordFile";
 
 const nfm64Row = new FixedWidthRecord(
   "nfm64",

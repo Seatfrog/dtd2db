@@ -1,5 +1,5 @@
 
-import {StationCoordinates} from "../../src/gtfs/repository/CIFRepository";
+import {StationCoordinates} from "@gtfs/repository/CIFRepository";
 
 export const stationCoordinates: StationCoordinates = {
   "AAP": {

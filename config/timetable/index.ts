@@ -1,5 +1,4 @@
-
-import {FeedConfig} from "../index";
+import {FeedConfig} from "@feed/FeedConfig";
 import MSN from "./file/MSN";
 import FLF from "./file/FLF";
 import MCA from "./file/MCA";

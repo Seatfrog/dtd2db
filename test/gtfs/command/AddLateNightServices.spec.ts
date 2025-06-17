@@ -1,9 +1,9 @@
 import * as chai from "chai";
-import {STP} from "../../../src/gtfs/native/OverlayRecord";
+import {STP} from "@gtfs/native/OverlayRecord";
 import {schedule} from "./MergeSchedules.spec";
 import {stop} from "./ApplyAssociations.spec";
-import {addLateNightServices} from "../../../src/gtfs/command/AddLateNightServices";
-import {Days} from "../../../src/gtfs/native/ScheduleCalendar";
+import {addLateNightServices} from "@gtfs/command/AddLateNightServices";
+import {Days} from "@gtfs/native/ScheduleCalendar";
 
 describe("AddLateNightServices", () => {
   const WEEK_DAYS: Days = { 0: 1, 1: 1, 2: 1, 3: 1, 4: 1, 5: 0, 6: 0 };

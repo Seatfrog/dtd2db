@@ -1,5 +1,4 @@
-
-import {MultiRecordFile} from "../../../src/feed/file/MultiRecordFile";
+import {MultiRecordFile} from "@feed/file/MultiRecordFile";
 import {association, stop, extraDetails, schedule, tiplocInsert} from "./MCA";
 
 const CFA = new MultiRecordFile({

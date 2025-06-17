@@ -1,8 +1,8 @@
-
-import {CSVRecord} from "../../../src/feed/record/CSVRecord";
-import {SingleRecordFile} from "../../../src/feed/file/SingleRecordFile";
-import {TextField} from "../../../src/feed/field/TextField";
-import {DateField} from "../../../src/feed/field/DateField";
+import {CSVRecord} from "@feed/record/mysql/CSVRecord";
+import {SingleRecordFile} from "@feed/file/SingleRecordFile";
+import {TextField} from "@feed/field/TextField";
+import {IntField} from "@feed/field/IntField";
+import {DateField} from "@feed/field/DateField";
 
 const record = new CSVRecord(
   "location",

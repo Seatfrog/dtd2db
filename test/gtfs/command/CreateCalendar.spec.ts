@@ -1,6 +1,6 @@
 import * as chai from "chai";
-import {createCalendar} from "../../../src/gtfs/command/CreateCalendar";
-import {STP} from "../../../src/gtfs/native/OverlayRecord";
+import {createCalendar} from "@gtfs/command/CreateCalendar";
+import {STP} from "@gtfs/native/OverlayRecord";
 import {schedule} from "./MergeSchedules.spec";
 
 describe("CreateCalendar", () => {

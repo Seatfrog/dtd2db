@@ -1,6 +1,6 @@
-import {CSVRecord} from "../../../src/feed/record/CSVRecord";
-import {IntField, ZeroFillIntField} from "../../../src/feed/field/IntField";
-import {TextField} from "../../../src/feed/field/TextField";
+import {CSVRecord} from "@feed/record/mysql/CSVRecord";
+import {IntField, ZeroFillIntField} from "@feed/field/IntField";
+import {TextField} from "@feed/field/TextField";
 import {BooleanField} from "../../../src/feed/field/BooleanField";
 import {MultiRecordFile} from "../../../src/feed/file/MultiRecordFile";
 

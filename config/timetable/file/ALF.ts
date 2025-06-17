@@ -1,14 +1,13 @@
-
-import {TextField, VariableLengthText} from "../../../src/feed/field/TextField";
-import {IntField} from "../../../src/feed/field/IntField";
-import {TimeField} from "../../../src/feed/field/TimeField";
-import {DateField} from "../../../src/feed/field/DateField";
-import {SingleRecordFile} from "../../../src/feed/file/SingleRecordFile";
-import {BooleanField} from "../../../src/feed/field/BooleanField";
+import {TextField, VariableLengthText} from "@feed/field/TextField";
+import {IntField} from "@feed/field/IntField";
+import {TimeField} from "@feed/field/TimeField";
+import {DateField} from "@feed/field/DateField";
+import {SingleRecordFile} from "@feed/file/SingleRecordFile";
+import {BooleanField} from "@feed/field/BooleanField";
 
 import memoize = require("memoized-class-decorator");
-import {Record, FieldMap, ParsedRecord, RecordAction} from "../../../src/feed/record/Record";
-import {FieldValue} from "../../../src/feed/field/Field";
+import {Record, FieldMap, ParsedRecord, RecordAction} from "@feed/record/Record";
+import {FieldValue} from "@feed/field/Field";
 import {isNullOrUndefined} from "util";
 
 /**

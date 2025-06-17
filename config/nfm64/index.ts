@@ -1,6 +1,5 @@
-
 import NFM64 from "./file/nfm64";
-import {FeedConfig} from "../index";
+import {FeedConfig} from "@feed/FeedConfig";
 
 export const downloadUrl = "http://iblocks-rg-publication.s3-website-eu-west-1.amazonaws.com/nfm64.zip";
 

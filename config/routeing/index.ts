@@ -1,4 +1,4 @@
-import {FeedConfig} from "../index";
+import {FeedConfig} from "@feed/FeedConfig";
 import RGS from "./file/RGS";
 import RGG from "./file/RGG";
 import RGP from "./file/RGP";

@@ -1,14 +1,13 @@
-
-import {FixedWidthRecord, RecordWithManualIdentifier} from "../../../src/feed/record/FixedWidthRecord";
-import {TextField, VariableLengthText} from "../../../src/feed/field/TextField";
-import {MultiRecordFile} from "../../../src/feed/file/MultiRecordFile";
-import {BooleanField} from "../../../src/feed/field/BooleanField";
-import {ShortDateField} from "../../../src/feed/field/DateField";
-import {IntField} from "../../../src/feed/field/IntField";
-import {ForeignKeyField} from "../../../src/feed/field/ForeignKeyField";
-import {TimeField} from "../../../src/feed/field/TimeField";
-import {MultiFormatRecord} from "../../../src/feed/record/MultiFormatRecord";
-import {RecordAction} from "../../../src/feed/record/Record";
+import {FixedWidthRecord, RecordWithManualIdentifier} from "@feed/record/mysql/FixedWidthRecord";
+import {TextField, VariableLengthText} from "@feed/field/TextField";
+import {MultiRecordFile} from "@feed/file/MultiRecordFile";
+import {BooleanField} from "@feed/field/BooleanField";
+import {ShortDateField} from "@feed/field/DateField";
+import {IntField} from "@feed/field/IntField";
+import {ForeignKeyField} from "@feed/field/ForeignKeyField";
+import {TimeField} from "@feed/field/TimeField";
+import {MultiFormatRecord} from "@feed/record/mysql/MultiFormatRecord";
+import {RecordAction} from "@feed/record/Record";
 
 export const tiplocInsert = new FixedWidthRecord(
   "tiploc",

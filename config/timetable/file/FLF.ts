@@ -1,8 +1,7 @@
-
-import {TextField, VariableLengthText} from "../../../src/feed/field/TextField";
-import {IntField} from "../../../src/feed/field/IntField";
-import {CSVRecord} from "../../../src/feed/record/CSVRecord";
-import {MultiRecordFile} from "../../../src/feed/file/MultiRecordFile";
+import {TextField, VariableLengthText} from "@feed/field/TextField";
+import {IntField} from "@feed/field/IntField";
+import {CSVRecord} from "@feed/record/mysql/CSVRecord";
+import {MultiRecordFile} from "@feed/file/MultiRecordFile";
 
 const fixedLink = new CSVRecord(
   "fixed_link",

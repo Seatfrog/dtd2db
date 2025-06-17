@@ -1,6 +1,7 @@
-import {SingleRecordFile} from "../../../src/feed/file/SingleRecordFile";
-import {TextField, VariableLengthText} from "../../../src/feed/field/TextField";
-import {FixedWidthRecord} from "../../../src/feed/record/FixedWidthRecord";
+import {CSVRecord} from "@feed/record/mysql/CSVRecord";
+import {SingleRecordFile} from "@feed/file/SingleRecordFile";
+import {TextField, VariableLengthText} from "@feed/field/TextField";
+import {FixedWidthRecord} from "@feed/record/mysql/FixedWidthRecord";
 
 const record = new FixedWidthRecord(
   "easement_text",
