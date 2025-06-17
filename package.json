@@ -1,7 +1,7 @@
 {
-  "name": "dtd2mysql",
+  "name": "dtd2db",
   "version": "6.6.0",
-  "description": "Command line tool to put the GB rail DTD feed into a MySQL compatible database",
+  "description": "Command line tool to put the GB rail DTD feed into a MySQL or Snowflake database",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "files": [
@@ -9,20 +9,22 @@
     "dist/config"
   ],
   "bin": {
-    "dtd2mysql": "bin/dtd2mysql.sh"
+    "dtd2db": "bin/dtd2db.sh"
   },
   "scripts": {
-    "test": "mocha --require ts-node/register 'test/**/*.spec.ts'",
+    "test": "NODE_OPTIONS='--experimental-specifier-resolution=node' mocha --require ts-node/register --require tsconfig-paths/register 'test/**/*.spec.ts'",
     "gtest": "mocha --require ts-node/register 'test/**/*.spec.ts' --grep",
     "watch-test": "mocha -w --require ts-node/register 'test/**/*.spec.ts'",
-    "start": "ts-node ./src/index.ts",
-    "prepublishOnly": "tsc -p ./ --outDir dist/",
+    "dev": "node dev.js",
+    "build": "node build.js",
+    "start": "node dist/bundle.js",
+    "prepublishOnly": "tsc -p ./ --outDir dist/ && tsc-alias",
     "gtfs": "NODE_OPTIONS='--max-old-space-size=16384' ts-node ./src/index.ts --gtfs",
     "gtfs-zip": "NODE_OPTIONS='--max-old-space-size=16384' ts-node ./src/index.ts --gtfs-zip"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/open-track/dtd2mysql.git"
+    "url": "git+https://github.com/seatfrog/dtd2db.git"
   },
   "keywords": [
     "gb",
@@ -36,11 +38,11 @@
   "author": "Linus Norton",
   "license": "GPL-3.0",
   "bugs": {
-    "url": "https://github.com/open-track/dtd2mysql/issues"
+    "url": "https://github.com/seatfrog/dtd2db/issues"
   },
-  "homepage": "https://github.com/open-track/dtd2mysql#readme",
+  "homepage": "https://github.com/seatfrog/dtd2db#readme",
   "dependencies": {
-    "@types/proj4": "^2.5.5",
+    "@types/proj4": "^2.5.6",
     "adm-zip": "^0.5.10",
     "byline": "^5.0.0",
     "csv-write-stream": "^2.0.0",
@@ -48,22 +50,33 @@
     "moment": "^2.29.4",
     "mysql2": "^3.6.1",
     "proj4": "^2.11.0",
+    "snowflake-sdk": "^2.1.0",
     "ssh2": "^1.14.0",
-    "stream-to-promise": "^3.0.0"
+    "stream-to-promise": "^2.0.0"
   },
   "engines": {
-    "node": "^14.14.0"
+    "node": "^20.0.0"
   },
   "devDependencies": {
+    "@types/adm-zip": "^0.5.7",
     "@types/byline": "^4.2.33",
-    "@types/chai": "^4.3.6",
-    "@types/mocha": "^10.0.1",
-    "@types/node": "^16.11.6",
-    "@types/ssh2": "^1.11.13",
+    "@types/chai": "^5.2.2",
+    "@types/chai-as-promised": "^8.0.2",
+    "@types/csv-write-stream": "^2.0.3",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "^22.15.19",
+    "@types/sinon": "^17.0.4",
+    "@types/sinon-chai": "^4.0.0",
+    "@types/ssh2": "^1.15.5",
     "@types/stream-to-promise": "^2.2.1",
-    "chai": "^4.3.8",
-    "mocha": "^10.2.0",
+    "chai": "^5.2.0",
+    "chai-as-promised": "^8.0.1",
+    "mocha": "^11.3.0",
+    "sinon": "^20.0.0",
+    "sinon-chai": "^4.0.0",
     "ts-node": "^10.9.1",
-    "typescript": "^5.2.2"
+    "tsc-alias": "^1.8.16",
+    "tsconfig-paths": "^4.2.0",
+    "typescript": "^5.8.3"
   }
 }

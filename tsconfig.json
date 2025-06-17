@@ -2,20 +2,31 @@
   "compilerOptions": {
     "moduleResolution": "node",
     "module": "commonjs",
-    "target": "es2017",
+    "target": "es2022",
+    "lib": ["es2022"],
     "sourceMap": true,
-    "experimentalDecorators": true,
-    "noImplicitAny": false,
-    "noImplicitThis": true,
-    "strictNullChecks": true,
     "declaration": true,
-    "lib": [
-      "esnext",
-      "dom"
-    ]
+    "esModuleInterop": true,
+    "outDir": "dist",
+    "rootDir": ".",
+    "baseUrl": ".",
+    "paths": {
+      "@config/*": ["config/*"],
+      "@database/*": ["src/database/*"],
+      "@cli/*": ["src/cli/*"],
+      "@feed/*": ["src/feed/*"],
+      "@gtfs/*": ["src/gtfs/*"],
+      "@utils/*": ["src/utils/*"],
+      "@src/*": ["src/*"],
+      "@types/*": ["src/types/*"]
+    },
+    "strict": false,
+    "noImplicitAny": false,
+    "strictNullChecks": false,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "skipLibCheck": true
   },
-  "exclude": [
-    "node_modules",
-    "dist/"
-  ]
+  "include": ["src/**/*", "test/**/*"],
+  "exclude": ["node_modules", "dist"]
 }
