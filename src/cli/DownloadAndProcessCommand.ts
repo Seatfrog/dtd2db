@@ -16,7 +16,7 @@ export class DownloadAndProcessCommand implements CLICommand {
 
     for (const filename of files) {
       try {
-        await this.process.doImport(filename);
+        await this.process.doImport(filename, null);
       }
       catch (err) {
         console.error(err);

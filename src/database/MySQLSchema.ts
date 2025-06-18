@@ -31,6 +31,21 @@ export class MySQLSchema implements DatabaseSchema {
     return this.db.query(`DROP TABLE IF EXISTS \`${this.record.name}\``);
   }
 
+  /**
+   * Check if the table exists
+   */
+  public async tableExists(): Promise<boolean> {
+    const query = `
+      SELECT COUNT(*) as count 
+      FROM information_schema.tables 
+      WHERE table_schema = DATABASE() 
+      AND table_name = '${this.record.name}'
+    `;
+    const result = await this.db.query(query) as [any[], any];
+    const rows = result[0];
+    return rows[0]?.count > 0;
+  }
+
   private getSchema(): string {
     const id = "id INT(11) unsigned auto_increment NOT NULL PRIMARY KEY";
     const fields = "," + Object.entries(this.record.fields).map(MySQLSchema.getField).join(',');

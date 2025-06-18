@@ -49,8 +49,14 @@ export class SnowflakeStream extends Writable {
 
       if (record) {
         this.logger.debug(`Found record type: ${record.name}`);
-        await this.tables[record.name].initialize();
-        await this.tables[record.name].apply(record.extractValues(line));
+        
+        // Check if we have a table object for this record type
+        if (this.tables[record.name]) {
+          await this.tables[record.name].initialize();
+          await this.tables[record.name].apply(record.extractValues(line));
+        } else {
+          this.logger.debug(`Skipping record type '${record.name}' - no table object available (likely filtered out)`);
+        }
       } else {
         this.logger.debug('No record type found for line');
       }

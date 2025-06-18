@@ -35,6 +35,18 @@ export class SnowflakeSchema implements DatabaseSchema {
     return this.db.query(`DROP TABLE IF EXISTS ${this.databaseName}.${this.schemaName}.${this.record.name.toUpperCase()}`);
   }
 
+  public async tableExists(): Promise<boolean> {
+    const query = `
+      SELECT COUNT(*) as count 
+      FROM INFORMATION_SCHEMA.TABLES 
+      WHERE TABLE_SCHEMA = '${this.schemaName}' 
+      AND TABLE_NAME = '${this.record.name.toUpperCase()}'
+    `;
+    const result = await this.db.query(query) as [any[], any];
+    const rows = result[0];
+    return rows[0]?.count > 0;
+  }
+
   private getSchema(): string {
     const fields = Object.entries(this.record.fields)
       .map(SnowflakeSchema.getField)

@@ -6,6 +6,7 @@ import { SnowflakeSchema } from "./SnowflakeSchema";
 export interface DatabaseSchema {
   createSchema(): Promise<any>;
   dropSchema(): Promise<any>;
+  tableExists(): Promise<boolean>;
 }
 
 export class DatabaseSchemaFactory {

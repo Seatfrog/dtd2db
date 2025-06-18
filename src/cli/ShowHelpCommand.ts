@@ -4,7 +4,7 @@ export class ShowHelpCommand implements CLICommand {
 
   public run(argv: string[]): Promise<void> {
     console.log(`
-Usage: dtd2db [COMMAND] [FILE]
+Usage: dtd2db [COMMAND] [FILE] [OPTIONS]
 Import a DTD feed into a database (MySQL or Snowflake)
 
   --fares [FILE]             import the fares feed 
@@ -23,6 +23,14 @@ Import a DTD feed into a database (MySQL or Snowflake)
   --get-timetable [DIR]      download and process latest timetable refresh from DTD
   --get-routeing [DIR]       download and process latest routeing refresh from DTD
   --get-nfm64 [DIR]          download and process latest nfm64 file
+
+Options:
+  --only [EXTENSION]         only process files with the specified extension (e.g., --only SUP)
+                            Example: dtd2db --fares file.zip --only SUP
+  --tables [TABLE_NAMES...]  only process tables with the specified names (space-separated)
+                            Example: dtd2db --fares file.zip --tables status supplement
+                            Available tables: toc, toc_fare, package, package_supplement, 
+                            ticket_price_band, location, flow, fare, restriction, etc.
   
 The following environment properties are expected to be set:
   

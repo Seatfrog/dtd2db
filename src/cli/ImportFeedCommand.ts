@@ -22,6 +22,86 @@ const getExt = filename => path.extname(filename).slice(1).toUpperCase();
 const readFile = filename => byline.createStream(fs.createReadStream(filename, "utf8"));
 
 /**
+ * Mapping from table names to file extensions for fares data
+ */
+const TABLE_TO_FILE_MAPPING: { [key: string]: string } = {
+  // TOC file
+  'toc': 'TOC',
+  'toc_fare': 'TOC',
+  // TPB file
+  'ticket_price_band': 'TPB',
+  // TPK file
+  'package': 'TPK',
+  'package_supplement': 'TPK',
+  // LOC file
+  'location': 'LOC',
+  'location_group': 'LOC',
+  'location_group_member': 'LOC',
+  'location_association': 'LOC',
+  'location_synonym': 'LOC',
+  'location_railcard': 'LOC',
+  // FFL file
+  'flow': 'FFL',
+  'fare': 'FFL',
+  // RTE file
+  'route': 'RTE',
+  'route_location': 'RTE',
+  // RST file
+  'restriction_header': 'RST',
+  'restriction_date': 'RST',
+  'restriction_header_date': 'RST',
+  'restriction_time': 'RST',
+  'restriction_time_date': 'RST',
+  'restriction_time_toc': 'RST',
+  'restriction_train': 'RST',
+  'restriction_train_date': 'RST',
+  'restriction_train_quota': 'RST',
+  'restriction_railcard': 'RST',
+  'restriction_exception': 'RST',
+  'restriction_ticket_calendar': 'RST',
+  // SUP file
+  'supplement': 'SUP',
+  'supplement_rule': 'SUP',
+  'supplement_rule_applies': 'SUP',
+  'supplement_rule_supplement': 'SUP',
+  'supplement_override': 'SUP',
+  // TTY file
+  'ticket_type': 'TTY',
+  // TVL file
+  'ticket_validity': 'TVL',
+  // TRR file
+  'rover': 'TRR',
+  'rover_price': 'TRR',
+  // DIS file
+  'status': 'DIS',
+  'status_discount': 'DIS',
+  // RLC file
+  'railcard': 'RLC',
+  // RCM file
+  'railcard_minimum_fare': 'RCM',
+  // TAP file
+  'advance_ticket': 'TAP',
+  // TCL file
+  'ticket_class': 'TCL',
+  // TJS file
+  'ticket_journey': 'TJS',
+  // TPN file
+  'ticket_price_network': 'TPN',
+  // TSP file
+  'ticket_supplement': 'TSP',
+  // FSC file
+  'station_cluster': 'FSC',
+  // FRR file
+  'fare_route_restriction': 'FRR',
+  // FNS file
+  'non_standard_discount': 'FNS',
+  // NDF file
+  'non_derivable_fare': 'NDF',
+  // NFO file
+  'non_derivable_fare_override': 'NFO'
+};
+
+/**
  * Imports one of the feeds
  */
 export class ImportFeedCommand implements CLICommand {
@@ -43,65 +123,215 @@ export class ImportFeedCommand implements CLICommand {
    * Do the import and then shut down the connection pool
    */
   public async run(argv: string[]): Promise<void> {
-    await this.doImport(argv[3]);
+    const filePath = argv[3];
+    const onlyFileTypes = this.parseOnlyFlag(argv);
+    const tableNames = this.parseTablesFlag(argv);
+    
+    // If --tables is specified, convert table names to file extensions
+    let finalFileTypes = onlyFileTypes;
+    if (tableNames) {
+      const fileTypesFromTables = this.convertTableNamesToFileTypes(tableNames);
+      finalFileTypes = fileTypesFromTables;
+    }
+    
+    await this.doImport(filePath, finalFileTypes, tableNames);
     return this.end();
+  }
+
+  /**
+   * Parse the --only flag from command line arguments (comma-separated list)
+   */
+  private parseOnlyFlag(argv: string[]): string[] | null {
+    const onlyIndex = argv.findIndex(arg => arg === '--only');
+    if (onlyIndex !== -1 && onlyIndex + 1 < argv.length) {
+      return argv[onlyIndex + 1].split(',').map(ext => ext.trim().toUpperCase());
+    }
+    return null;
+  }
+
+  /**
+   * Parse the --tables flag from command line arguments (space-separated list)
+   */
+  private parseTablesFlag(argv: string[]): string[] | null {
+    const tablesIndex = argv.findIndex(arg => arg === '--tables');
+    if (tablesIndex !== -1 && tablesIndex + 1 < argv.length) {
+      // Collect all arguments after --tables until the next flag (starting with --) or end of input
+      const tableNames: string[] = [];
+      for (let i = tablesIndex + 1; i < argv.length; i++) {
+        if (argv[i].startsWith('--')) break;
+        if (argv[i].trim().length > 0) {
+          tableNames.push(argv[i].trim().toLowerCase());
+        }
+      }
+      console.log(`🔍 Parsed table names: [${tableNames.map(t => `"${t}"`).join(', ')}]`);
+      return tableNames.length > 0 ? tableNames : null;
+    }
+    return null;
+  }
+
+  /**
+   * Convert table names to file extensions using the mapping
+   */
+  private convertTableNamesToFileTypes(tableNames: string[]): string[] {
+    const fileTypes = new Set<string>();
+    
+    for (const tableName of tableNames) {
+      const fileType = TABLE_TO_FILE_MAPPING[tableName];
+      if (fileType) {
+        fileTypes.add(fileType);
+      } else {
+        console.warn(`Warning: Unknown table name '${tableName}'. Available tables: ${Object.keys(TABLE_TO_FILE_MAPPING).join(', ')}`);
+      }
+    }
+    
+    return Array.from(fileTypes);
   }
 
   /**
    * Extract the zip, set up the schema and do the inserts
    */
-  public async doImport(filePath: string): Promise<void> {
+  public async doImport(filePath: string, onlyFileTypes: string[] | null, tableNames: string[] | null = null): Promise<void> {
+    const startTime = Date.now();
+    console.log(`\n=== STARTING IMPORT PROCESS ===`);
+    console.log(`File: ${filePath}`);
+    console.log(`Only file types: ${onlyFileTypes ? onlyFileTypes.join(', ') : 'ALL'}`);
+    console.log(`Only tables: ${tableNames ? tableNames.join(', ') : 'ALL'}`);
+    console.log(`Temp folder: ${this.tmpFolder}`);
+    
+    console.log(`\n[${new Date().toISOString()}] Step 1: Extracting ZIP file...`);
     console.log(`Extracting ${filePath} to ${this.tmpFolder}`);
     fs.rmSync(this.tmpFolder, {recursive: true, force: true});
 
     new AdmZip(filePath).extractAllTo(this.tmpFolder);
+    console.log(`✓ ZIP extraction completed`);
 
     const zipName = path.basename(filePath);
 
-    // if the file is a not an incremental, reset the database schema
-    if (zipName.charAt(4) !== "C") {
-      // Run schema setup sequentially
-      for (const file of this.fileArray) {
-        await this.setupSchema(file);
-      }
-    }
+    console.log(`\n[${new Date().toISOString()}] Step 2: Analyzing files to process...`);
+    // Determine which files we'll be processing
+    const allFiles = fs.readdirSync(this.tmpFolder);
+    const filesToProcess = allFiles
+      .filter(filename => this.getFeedFile(filename))
+      .filter(filename => {
+        // If onlyFileTypes is specified, only process files with those extensions
+        if (onlyFileTypes) {
+          const ext = getExt(filename);
+          return onlyFileTypes.includes(ext);
+        }
+        return true;
+      });
+
+    console.log(`Total files in ZIP: ${allFiles.length}`);
+    console.log(`Files with config: ${allFiles.filter(f => this.getFeedFile(f)).length}`);
+    console.log(`Files that will be processed: ${filesToProcess.length}`);
+    console.log('Files that will be processed:', filesToProcess);
+
+    console.log(`\n[${new Date().toISOString()}] Step 3: Checking and creating required schemas...`);
+    // Check and create all required schemas upfront
+    await this.ensureAllRequiredSchemas(filesToProcess, tableNames);
+    console.log(`✓ Schema setup completed`);
     
+    console.log(`\n[${new Date().toISOString()}] Step 4: Setting up log table...`);
     // Always ensure the log table exists
     await this.createLastProcessedSchema();
+    console.log(`✓ Log table setup completed`);
 
     if (this.files["CFA"] instanceof MultiRecordFile) {
+      console.log(`\n[${new Date().toISOString()}] Step 5: Setting last schedule ID...`);
       await this.setLastScheduleId();
+      console.log(`✓ Last schedule ID set`);
     }
 
+    console.log(`\n[${new Date().toISOString()}] Step 6: Processing files...`);
     // Process files sequentially
-    const files = fs.readdirSync(this.tmpFolder)
-      .filter(filename => this.getFeedFile(filename));
-    
-    for (const filename of files) {
-      console.log(`Processing file: ${filename}`);
-      await this.processFile(filename);
+    for (let i = 0; i < filesToProcess.length; i++) {
+      const filename = filesToProcess[i];
+      console.log(`\n[${new Date().toISOString()}] Processing file ${i + 1}/${filesToProcess.length}: ${filename}`);
+      const fileStartTime = Date.now();
+      await this.processFile(filename, tableNames);
+      const fileEndTime = Date.now();
+      console.log(`✓ Finished processing ${filename} (took ${fileEndTime - fileStartTime}ms)`);
     }
 
     if (this.files["CFA"] instanceof MultiRecordFile) {
+      console.log(`\n[${new Date().toISOString()}] Step 7: Cleaning up orphan stop times...`);
       await this.removeOrphanStopTimes();
+      console.log(`✓ Orphan cleanup completed`);
     }
 
+    console.log(`\n[${new Date().toISOString()}] Step 8: Updating last processed file...`);
     await this.updateLastFile(zipName);
+    console.log(`✓ Last processed file updated`);
+
+    console.log(`\n[${new Date().toISOString()}] Step 9: Cleaning up temp folder...`);
     fs.rmSync(this.tmpFolder, { recursive: true });
+    console.log(`✓ Temp folder cleaned up`);
+
+    const endTime = Date.now();
+    console.log(`\n=== IMPORT PROCESS COMPLETED ===`);
+    console.log(`Total time: ${endTime - startTime}ms`);
+    console.log(`Files processed: ${filesToProcess.length}`);
+    console.log(`================================\n`);
   }
 
   /**
-   * Drop and recreate the tables
+   * Check and create all required schemas for the files we'll be processing
    */
-  protected async setupSchema(file: FeedFile): Promise<void> {
-    // Run schema operations sequentially
-    const schemas = this.schemas(file);
-    for (const schema of schemas) {
-      await schema.dropSchema();
+  private async ensureAllRequiredSchemas(filesToProcess: string[], tableNames: string[] | null = null): Promise<void> {
+    console.log(`Checking schemas for ${filesToProcess.length} files...`);
+    
+    let totalTablesChecked = 0;
+    let totalTablesCreated = 0;
+    let totalTablesSkipped = 0;
+    
+    for (const filename of filesToProcess) {
+      const file = this.getFeedFile(filename);
+      if (!file) {
+        console.log(`⚠️  No config found for file: ${filename}`);
+        continue;
+      }
+
+      console.log(`\nChecking schemas for file: ${filename}`);
+      const schemas = this.schemas(file);
+      console.log(`  Found ${schemas.length} record types in this file`);
+      
+      for (const schema of schemas) {
+        const tableName = (schema as any).record?.name;
+        totalTablesChecked++;
+        
+        // If tableNames is specified, only create schemas for those specific tables
+        if (tableNames && tableName && !tableNames.includes(tableName)) {
+          console.log(`  ⏭️  Skipping table '${tableName}' (not in requested tables: ${tableNames.join(', ')})`);
+          totalTablesSkipped++;
+          continue;
+        }
+        
+        console.log(`  Checking table: ${tableName}`);
+        const exists = await schema.tableExists();
+        if (!exists) {
+          console.log(`  ➕ Creating table: ${tableName}`);
+          await schema.createSchema();
+          totalTablesCreated++;
+        } else {
+          console.log(`  ✓ Table already exists: ${tableName}`);
+          totalTablesSkipped++;
+        }
+      }
     }
-    for (const schema of schemas) {
-      await schema.createSchema();
-    }
+    
+    console.log(`\n📊 Schema Summary:`);
+    console.log(`  Tables checked: ${totalTablesChecked}`);
+    console.log(`  Tables created: ${totalTablesCreated}`);
+    console.log(`  Tables skipped: ${totalTablesSkipped}`);
+  }
+
+  /**
+   * Drop and recreate the tables only if they don't exist
+   */
+  protected async setupSchema(file: FeedFile, tableNames: string[] | null = null): Promise<void> {
+    // This method is now deprecated in favor of ensureAllRequiredSchemas
+    // Keeping it for backward compatibility but it's no longer used
+    console.warn('setupSchema is deprecated, use ensureAllRequiredSchemas instead');
   }
 
   /**
@@ -167,26 +397,45 @@ export class ImportFeedCommand implements CLICommand {
   /**
    * Process the records inside the given file
    */
-  protected async processFile(filename: string): Promise<any> {
+  protected async processFile(filename: string, tableNames: string[] | null = null): Promise<any> {
+    console.log(`    📁 Starting to process file: ${filename}`);
+    
     const file = this.getFeedFile(filename);
-    const tables = await this.tables(file);
+    if (!file) {
+      console.log(`    ❌ No config found for file: ${filename}`);
+      return;
+    }
+    
+    console.log(`    📋 Getting tables for file: ${filename}`);
+    const tables = await this.tables(file, tableNames);
+    console.log(`    📊 Tables prepared: ${Object.keys(tables).join(', ')}`);
+    
+    console.log(`    🔄 Creating stream for file: ${filename}`);
     const tableStream = new MySQLStream(filename, file, tables);
     const stream = readFile(`${this.tmpFolder}/${filename}`).pipe(tableStream);
 
     try {
+      console.log(`    ⏳ Processing stream for file: ${filename}`);
+      const startTime = Date.now();
       await streamToPromise(stream);
-
-      console.log(`Finished processing ${filename}`);
+      const endTime = Date.now();
+      
+      console.log(`    ✅ Successfully processed ${filename} (stream took ${endTime - startTime}ms)`);
     }
     catch (err) {
-      console.error(`Error processing ${filename}`);
-      console.error(err);
+      console.error(`    ❌ Error processing ${filename}:`);
+      console.error(`    ${err}`);
+      throw err; // Re-throw to ensure the error is handled by the caller
     }
   }
 
   @memoize
   protected getFeedFile(filename: string): FeedFile {
     const ext = getExt(filename);
+    const configFound = !!this.files[ext];
+    if (!configFound) {
+      console.log(`      ⚠️  No config found for extension: ${ext} (file: ${filename})`);
+    }
     return this.files[ext];
   }
 
@@ -201,16 +450,22 @@ export class ImportFeedCommand implements CLICommand {
   }
 
   @memoize
-  protected async tables(file: FeedFile): Promise<any> {
-    console.log('tables method called');
+  protected async tables(file: FeedFile, tableNames: string[] | null = null): Promise<any> {
     const index = {};
     const isSnowflake = process.env.DATABASE_TYPE === "snowflake";
-    console.log('isSnowflake:', isSnowflake);
+    console.log(`      🗄️  Database type: ${isSnowflake ? 'Snowflake' : 'MySQL'}`);
+    console.log(`      📝 Record types: ${file.recordTypes.map(r => r.name).join(', ')}`);
 
     for (const record of file.recordTypes) {
+      // If tableNames is specified, only create table objects for those specific tables
+      if (tableNames && !tableNames.includes(record.name)) {
+        console.log(`      ⏭️  Skipping table object creation for: ${record.name} (not in requested tables: ${tableNames.join(', ')})`);
+        continue;
+      }
+
       if (!index[record.name]) {
         const db = record.orderedInserts ? await this.db.getConnection() : this.db;
-        console.log('Creating table for record:', record.name);
+        console.log(`      🏗️  Creating table object for: ${record.name}`);
         index[record.name] = isSnowflake 
           ? new SnowflakeTable(db, record.name, process.env.SNOWFLAKE_SCHEMA!, process.env.DATABASE_NAME!)
           : new MySQLTable(db, record.name);
