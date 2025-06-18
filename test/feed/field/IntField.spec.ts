@@ -1,5 +1,5 @@
 import * as chai from "chai";
-import {IntField} from "../../../src/feed/field/IntField";
+import {IntField} from "@feed/field/IntField";
 
 describe("IntField", () => {
 

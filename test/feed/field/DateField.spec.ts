@@ -1,5 +1,5 @@
 import * as chai from "chai";
-import {DateField, ShortDateField} from "../../../src/feed/field/DateField";
+import {DateField, ShortDateField} from "@feed/field/DateField";
 
 describe("DateField", () => {
 

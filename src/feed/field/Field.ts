@@ -1,6 +1,11 @@
+import memoize from "memoized-class-decorator";
 
-import {isNullOrUndefined} from "util";
-import * as memoize from "memoized-class-decorator";
+/**
+ * Check if a value is null or undefined
+ */
+function isNullOrUndefined(value: any): boolean {
+  return value === null || value === undefined;
+}
 
 /**
  * Parent class for all fields

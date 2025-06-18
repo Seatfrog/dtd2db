@@ -1,5 +1,5 @@
 import * as chai from "chai";
-import {BooleanField} from "../../../src/feed/field/BooleanField";
+import {BooleanField} from "@feed/field/BooleanField";
 
 describe("BooleanField", () => {
 

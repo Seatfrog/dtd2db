@@ -1,5 +1,4 @@
-
-import {Field} from "./Field";
+import {Field} from "@feed/field/Field";
 
 /**
  * DTD date field (e.g. 3112999)

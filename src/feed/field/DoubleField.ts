@@ -1,5 +1,4 @@
-
-import {Field, ParseError} from "./Field";
+import {Field, ParseError} from "@feed/field/Field";
 
 export class DoubleField extends Field {
 
