@@ -1,4 +1,4 @@
-import {CLICommand} from "./CLICommand";
+import {CLICommand} from "@cli/CLICommand";
 
 import * as http from "http";
 import * as fs from "fs";

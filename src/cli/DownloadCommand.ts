@@ -1,6 +1,6 @@
-import {CLICommand} from "./CLICommand";
-import {PromiseSFTP} from "../sftp/PromiseSFTP";
-import {DatabaseConnection} from "../database/DatabaseConnection";
+import {CLICommand} from "@cli/CLICommand";
+import {PromiseSFTP} from "@src/sftp/PromiseSFTP";
+import {DatabaseConnection} from "@database/DatabaseConnection";
 import { FileEntry } from "ssh2";
 
 interface LogEntry {

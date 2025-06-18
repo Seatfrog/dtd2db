@@ -1,6 +1,5 @@
-
-import {CLICommand} from "./CLICommand";
-import {DatabaseConnection} from "../database/DatabaseConnection";
+import {CLICommand} from "@cli/CLICommand";
+import {DatabaseConnection} from "@database/DatabaseConnection";
 import moment = require("moment");
 import {Moment} from "moment";
 
@@ -47,7 +46,7 @@ export class CleanFaresCommand implements CLICommand {
   ];
 
   constructor(
-    private readonly db: DatabaseConnection
+    protected readonly db: DatabaseConnection
   ) {}
 
   /**
@@ -68,13 +67,13 @@ export class CleanFaresCommand implements CLICommand {
     await this.db.end();
   }
 
-  private async clean(): Promise<void> {
+  protected async clean(): Promise<void> {
     await Promise.all(this.queries.map(q => this.queryWithRetry(q)));
 
     console.log("Removed old and irrelevant fares data");
   }
 
-  private async applyRestrictionDates(): Promise<void> {
+  protected async applyRestrictionDates(): Promise<void> {
     const [[current, future]] = await this.db.query<RestrictionDateRow>("SELECT * FROM restriction_date ORDER BY cf_mkr");
     current.start_date = new Date(current.start_date.getFullYear(), 0, 1);
 
@@ -84,7 +83,7 @@ export class CleanFaresCommand implements CLICommand {
     console.log("Applied restriction dates");
   }
 
-  private async updateRestrictionDatesOnTable(tableName: string, current: RestrictionDateRow, future: RestrictionDateRow): Promise<any> {
+  protected async updateRestrictionDatesOnTable(tableName: string, current: RestrictionDateRow, future: RestrictionDateRow): Promise<any> {
     const [records] = await this.db.query<RestrictionRow>(`SELECT * FROM ${tableName}`);
     const promises = records.map(record => {
       const date = record.cf_mkr === 'C' ? current : future;
@@ -110,14 +109,14 @@ export class CleanFaresCommand implements CLICommand {
    * Given a short form restriction month MMDD this method will return the first instance of that date that occurs
    * after the given date. For example with a restriction date of 2017-06-01 the earliest date of 0301 is 2018-03-01
    */
-  private getFirstDateAfter(earliestDate: Date, restrictionMonth: string): Moment {
+  protected getFirstDateAfter(earliestDate: Date, restrictionMonth: string): Moment {
     const earliestMonth = moment(earliestDate).format("MMDD");
     const yearOffset = (parseInt(earliestMonth) > parseInt(restrictionMonth)) ? 1 : 0;
 
     return moment((earliestDate.getFullYear() + yearOffset) + restrictionMonth, "YYYYMMDD");
   }
 
-  private async queryWithRetry(query: string, max: number = 10, current: number = 1): Promise<void> {
+  protected async queryWithRetry(query: string, max: number = 10, current: number = 1): Promise<void> {
     try {
       await this.db.query(query)
     }
@@ -131,7 +130,7 @@ export class CleanFaresCommand implements CLICommand {
     }
   }
 
-  private async setNetworkAreaRestrictionCodes(): Promise<void> {
+  protected async setNetworkAreaRestrictionCodes(): Promise<void> {
     await this.queryWithRetry("DELETE FROM fare WHERE fare < 5 OR fare = 99999 OR fare >= 999999");
     await this.queryWithRetry("DROP TABLE IF EXISTS network_flow_restriction");
     await this.queryWithRetry(`
@@ -155,7 +154,6 @@ export class CleanFaresCommand implements CLICommand {
 
     console.log("Calculated network area restrictions");
   }
-
 }
 
 interface RestrictionRow {

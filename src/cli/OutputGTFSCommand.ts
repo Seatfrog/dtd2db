@@ -1,16 +1,16 @@
-import {CLICommand} from "./CLICommand";
-import {CIFRepository} from "../gtfs/repository/CIFRepository";
-import {Schedule} from "../gtfs/native/Schedule";
-import {agencies} from "../../config/gtfs/agency";
-import {Association} from "../gtfs/native/Association";
-import {applyOverlays} from "../gtfs/command/ApplyOverlays";
-import {mergeSchedules} from "../gtfs/command/MergeSchedules";
-import {applyAssociations, AssociationIndex, ScheduleIndex} from "../gtfs/command/ApplyAssociations";
-import {createCalendar, ServiceIdIndex} from "../gtfs/command/CreateCalendar";
-import {ScheduleResults} from "../gtfs/repository/ScheduleBuilder";
-import {GTFSOutput} from "../gtfs/output/GTFSOutput";
+import {CLICommand} from "@cli/CLICommand";
+import {CIFRepository} from "@gtfs/repository/CIFRepository";
+import {Schedule} from "@gtfs/native/Schedule";
+import {agencies} from "@config/gtfs/agency";
+import {Association} from "@gtfs/native/Association";
+import {applyOverlays} from "@gtfs/command/ApplyOverlays";
+import {mergeSchedules} from "@gtfs/command/MergeSchedules";
+import {applyAssociations, AssociationIndex, ScheduleIndex} from "@gtfs/command/ApplyAssociations";
+import {createCalendar, ServiceIdIndex} from "@gtfs/command/CreateCalendar";
+import {ScheduleResults} from "@gtfs/repository/ScheduleBuilder";
+import {GTFSOutput} from "@gtfs/output/GTFSOutput";
 import * as fs from "fs";
-import {addLateNightServices} from "../gtfs/command/AddLateNightServices";
+import {addLateNightServices} from "@gtfs/command/AddLateNightServices";
 import streamToPromise = require("stream-to-promise");
 
 export class OutputGTFSCommand implements CLICommand {

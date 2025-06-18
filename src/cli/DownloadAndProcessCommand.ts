@@ -1,6 +1,5 @@
-
-import {CLICommand} from "./CLICommand";
-import {ImportFeedCommand} from "./ImportFeedCommand";
+import {CLICommand} from "@cli/CLICommand";
+import {ImportFeedCommand} from "@cli/ImportFeedCommand";
 
 export class DownloadAndProcessCommand implements CLICommand {
 
