@@ -78,6 +78,7 @@ export class ImportFeedCommand implements CLICommand {
       .filter(filename => this.getFeedFile(filename));
     
     for (const filename of files) {
+      console.log(`Processing file: ${filename}`);
       await this.processFile(filename);
     }
 
@@ -185,7 +186,8 @@ export class ImportFeedCommand implements CLICommand {
 
   @memoize
   protected getFeedFile(filename: string): FeedFile {
-    return this.files[getExt(filename)];
+    const ext = getExt(filename);
+    return this.files[ext];
   }
 
   @memoize

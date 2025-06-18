@@ -38,21 +38,21 @@ const supplementRule = new SnowflakeFixedWidthRecord(
   "supplement_rule",
   ["rule_number", "end_date"],
   {
-    "rule_number": new TrimmedTextField(2, 3, false),
-    "end_date": new TrimmedTextField(5, 8, false),
-    "start_date": new TrimmedTextField(13, 8, false),
-    "quote_date": new TrimmedTextField(21, 8, false),
+    "rule_number": new TrimmedTextField(2, 3, true),
+    "end_date": new TrimmedTextField(5, 8, true),
+    "start_date": new TrimmedTextField(13, 8, true),
+    "quote_date": new TrimmedTextField(21, 8, true),
     "train_uid": new TrimmedTextField(29, 7, true),
     "train_uid_desc": new TrimmedTextField(36, 39, true),
-    "fare_class": new TrimmedTextField(75, 1, false),
-    "quota": new TrimmedTextField(76, 1, false),
-    "weekend_first": new TrimmedTextField(77, 1, false),
-    "silver_standard": new TrimmedTextField(78, 1, false),
-    "railcard": new TrimmedTextField(79, 1, false),
-    "catering_code": new TrimmedTextField(80, 1, false),
-    "sleeper": new TrimmedTextField(81, 1, false),
-    "accom_class": new TrimmedTextField(82, 1, false),
-    "status": new TrimmedTextField(83, 1, false),
+    "fare_class": new TrimmedTextField(75, 1, true),
+    "quota": new TrimmedTextField(76, 1, true),
+    "weekend_first": new TrimmedTextField(77, 1, true),
+    "silver_standard": new TrimmedTextField(78, 1, true),
+    "railcard": new TrimmedTextField(79, 1, true),
+    "catering_code": new TrimmedTextField(80, 1, true),
+    "sleeper": new TrimmedTextField(81, 1, true),
+    "accom_class": new TrimmedTextField(82, 1, true),
+    "status": new TrimmedTextField(83, 1, true),
     "reservation_status": new TrimmedTextField(84, 3, true),
     "sectors": new TrimmedTextField(87, 3, true)
   },
@@ -69,11 +69,11 @@ const supplementRuleApplies = new SnowflakeFixedWidthRecord(
   "supplement_rule_applies",
   ["rule_number", "end_date", "ie_marker", "condition_type", "ie_code"],
   {
-    "rule_number": new TrimmedTextField(2, 3, false),
-    "end_date": new TrimmedTextField(5, 8, false),
-    "ie_marker": new TrimmedTextField(13, 1, false),
-    "condition_type": new TrimmedTextField(14, 1, false),
-    "ie_code": new TrimmedTextField(15, 3, false)
+    "rule_number": new TrimmedTextField(2, 3, true),
+    "end_date": new TrimmedTextField(5, 8, true),
+    "ie_marker": new TrimmedTextField(13, 1, true),
+    "condition_type": new TrimmedTextField(14, 1, true),
+    "ie_code": new TrimmedTextField(15, 3, true)
   },
   [],
   {
@@ -88,10 +88,10 @@ const supplementRuleSupplement = new SnowflakeFixedWidthRecord(
   "supplement_rule_supplement",
   ["rule_number", "end_date", "supplement_code"],
   {
-    "rule_number": new TrimmedTextField(2, 3, false),
-    "end_date": new TrimmedTextField(5, 8, false),
-    "supplement_code": new TrimmedTextField(13, 3, false),
-    "om_flag": new TrimmedTextField(16, 1, false)
+    "rule_number": new TrimmedTextField(2, 3, true),
+    "end_date": new TrimmedTextField(5, 8, true),
+    "supplement_code": new TrimmedTextField(13, 3, true),
+    "om_flag": new TrimmedTextField(16, 1, true)
   },
   [],
   {
@@ -106,9 +106,9 @@ const supplementOverride = new SnowflakeFixedWidthRecord(
   "supplement_override",
   ["supplement_code", "end_date", "overridden_supplement"],
   {
-    "supplement_code": new TrimmedTextField(2, 3, false),
-    "end_date": new TrimmedTextField(5, 8, false),
-    "overridden_supplement": new TrimmedTextField(13, 3, false)
+    "supplement_code": new TrimmedTextField(2, 3, true),
+    "end_date": new TrimmedTextField(5, 8, true),
+    "overridden_supplement": new TrimmedTextField(13, 3, true)
   },
   [],
   {

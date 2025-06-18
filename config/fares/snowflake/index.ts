@@ -18,12 +18,18 @@ import TOC from "./TOC";
 import TVL from "./TVL";
 import TRR from "./TRR";
 import TPK from "./TPK";
+import FRR from "./FRR";
+import TCL from "./TCL";
+import TJS from "./TJS";
+import TPB from "./TPB";
+import TPN from "./TPN";
 
 const snowflake: FeedConfig = {
   DIS,
   FFL,
   FNS,
   FSC,
+  FRR,
   LOC,
   NDF,
   NFO,
@@ -33,8 +39,12 @@ const snowflake: FeedConfig = {
   RTE,
   SUP,
   TAP,
+  TCL,
+  TJS,
   TOC,
+  TPB,
   TPK,
+  TPN,
   TRR,
   TSP,
   TTY,
