@@ -1,10 +1,9 @@
-
 import * as chai from "chai";
-import {IntField} from "../../../src/feed/field/IntField";
-import {TextField} from "../../../src/feed/field/TextField";
-import {DateField} from "../../../src/feed/field/DateField";
-import {FixedWidthRecord, RecordWithManualIdentifier} from "../../../src/feed/record/FixedWidthRecord";
-import {RecordAction} from "../../../src/feed/record/Record";
+import {IntField} from "@feed/field/IntField";
+import {TextField} from "@feed/field/TextField";
+import {DateField} from "@feed/field/DateField";
+import {FixedWidthRecord} from "@feed/record/mysql/FixedWidthRecord";
+import {RecordAction} from "@feed/record/Record";
 
 describe("FixedWidthRecord", () => {
 
@@ -105,76 +104,5 @@ describe("FixedWidthRecord", () => {
       }
     });
   });
-});
-
-describe("RecordWithManualIdentifier", () => {
-
-  it("populates the id field", () => {
-    const field = new IntField(0, 4);
-    const field2 = new TextField(4, 3);
-    const field3 = new DateField(7);
-
-    const record = new RecordWithManualIdentifier(
-      "test",
-      [], {
-        "field": field,
-        "field2": field2,
-        "field3": field3
-      });
-
-    chai.expect(record.extractValues("1012Hi 31122999")).to.deep.equal({
-      action: RecordAction.Insert,
-      keysValues: {},
-      values: {
-        id: 1,
-        field: 1012,
-        field2: "Hi ",
-        field3: "2999-12-31"
-      }
-    });
-  });
-
-  it("increments the id field", () => {
-    const field = new IntField(0, 4);
-    const field2 = new TextField(4, 3);
-
-    const record = new RecordWithManualIdentifier(
-      "test",
-      [], {
-        "field": field,
-        "field2": field2,
-      });
-
-    chai.expect(record.extractValues("1012Hi 31122999")).to.deep.equal({
-      action: RecordAction.Insert,
-      keysValues: {},
-      values: {
-        id: 1,
-        field: 1012,
-        field2: "Hi "
-      }
-    });
-
-    chai.expect(record.extractValues("1012Hi 31122999")).to.deep.equal({
-      action: RecordAction.Insert,
-      keysValues: {},
-      values: {
-        id: 2,
-        field: 1012,
-        field2: "Hi "
-      }
-    });
-
-    chai.expect(record.extractValues("1012Hi 31122999")).to.deep.equal({
-      action: RecordAction.Insert,
-      keysValues: {},
-      values: {
-        id: 3,
-        field: 1012,
-        field2: "Hi "
-      }
-    });
-  });
-
 });
 

@@ -1,10 +1,9 @@
-
 import * as chai from "chai";
-import {FixedWidthRecord} from "../../../src/feed/record/FixedWidthRecord";
-import {IntField} from "../../../src/feed/field/IntField";
-import {DateField} from "../../../src/feed/field/DateField";
-import {TextField} from "../../../src/feed/field/TextField";
-import {MultiRecordFile} from "../../../src/feed/file/MultiRecordFile";
+import {FixedWidthRecord} from "@feed/record/mysql/FixedWidthRecord";
+import {IntField} from "@feed/field/IntField";
+import {DateField} from "@feed/field/DateField";
+import {TextField} from "@feed/field/TextField";
+import {MultiRecordFile} from "@feed/file/MultiRecordFile";
 
 describe("MultiRecordFile", () => {
   const field = new IntField(1, 3);

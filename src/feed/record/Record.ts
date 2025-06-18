@@ -1,5 +1,4 @@
-
-import {Field, FieldValue} from "../field/Field";
+import {Field, FieldValue} from "@feed/field/Field";
 
 export interface Record {
 

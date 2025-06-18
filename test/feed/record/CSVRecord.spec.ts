@@ -1,10 +1,9 @@
-
 import * as chai from "chai";
-import {DoubleField} from "../../../src/feed/field/DoubleField";
-import {TextField} from "../../../src/feed/field/TextField";
-import {CSVRecord} from "../../../src/feed/record/CSVRecord";
-import {DateField} from "../../../src/feed/field/DateField";
-import {RecordAction} from "../../../src/feed/record/Record";
+import {DoubleField} from "@feed/field/DoubleField";
+import {TextField} from "@feed/field/TextField";
+import {CSVRecord} from "@feed/record/mysql/CSVRecord";
+import {DateField} from "@feed/field/DateField";
+import {RecordAction} from "@feed/record/Record";
 
 describe("CSVRecord", () => {
 
