@@ -1,11 +1,11 @@
 import {CLICommand} from "@cli/CLICommand";
-import {ImportFeedCommand} from "@cli/ImportFeedCommand";
+import {BaseImportFeedCommand} from "@cli/BaseImportFeedCommand";
 
 export class DownloadAndProcessCommand implements CLICommand {
 
   constructor(
     private readonly download: FileProvider,
-    private readonly process: ImportFeedCommand
+    private readonly process: BaseImportFeedCommand
   ) {}
 
   /**

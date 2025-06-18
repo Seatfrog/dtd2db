@@ -1,17 +1,16 @@
-import { ImportFeedCommand } from "@cli/ImportFeedCommand";
+import { BaseImportFeedCommand } from "@cli/BaseImportFeedCommand";
 import { DatabaseConnection } from "@database/DatabaseConnection";
 import { FeedConfig } from "@feed/FeedConfig";
 import { SnowflakeStream } from "@database/SnowflakeStream";
 import { FeedFile } from "@feed/file/FeedFile";
 import { SnowflakeTable } from "@database/SnowflakeTable";
-import byline = require("byline");
-import streamToPromise = require("stream-to-promise");
-import * as fs from "fs";
+import { SnowflakeSchema } from "@database/SnowflakeSchema";
+import { Record } from "@feed/record/Record";
 
 /**
  * Snowflake-specific implementation of ImportFeedCommand
  */
-export class SnowflakeImportFeedCommand extends ImportFeedCommand {
+export class SnowflakeImportFeedCommand extends BaseImportFeedCommand {
   constructor(
     db: DatabaseConnection,
     files: FeedConfig,
@@ -21,69 +20,85 @@ export class SnowflakeImportFeedCommand extends ImportFeedCommand {
   }
 
   /**
-   * Process the records inside the given file using Snowflake-specific stream
+   * Get the database type name for logging
    */
-  protected async processFile(filename: string, tableNames: string[] | null = null): Promise<any> {
-    console.log(`    📁 Starting to process file: ${filename}`);
-    
-    const file = this.getFeedFile(filename);
-    if (!file) {
-      console.log(`    ❌ No config found for file: ${filename}`);
-      return;
-    }
-    
-    console.log(`    📋 Getting tables for file: ${filename}`);
-    const tables = await this.tables(file, tableNames);
-    console.log(`    📊 Tables prepared: ${Object.keys(tables).join(', ')}`);
-    
-    console.log(`    🔄 Creating Snowflake stream for file: ${filename}`);
-    const tableStream = new SnowflakeStream(filename, file, tables);
-    const stream = byline.createStream(fs.createReadStream(`${this.tmpFolder}/${filename}`, "utf8")).pipe(tableStream);
-
-    try {
-      console.log(`    ⏳ Processing Snowflake stream for file: ${filename}`);
-      const startTime = Date.now();
-      await streamToPromise(stream);
-      const endTime = Date.now();
-      
-      console.log(`    ✅ Successfully processed ${filename} (Snowflake stream took ${endTime - startTime}ms)`);
-    }
-    catch (err) {
-      console.error(`    ❌ Error processing ${filename}:`);
-      console.error(`    ${err}`);
-      throw err; // Re-throw to ensure the error is handled by the caller
-    }
+  protected getDatabaseType(): string {
+    return "Snowflake";
   }
 
   /**
-   * Get tables for the given file using Snowflake-specific table implementation
+   * Create the Snowflake stream
    */
-  protected async tables(file: FeedFile, tableNames: string[] | null = null): Promise<any> {
-    const index = {};
-    console.log(`      🗄️  Database type: Snowflake`);
-    console.log(`      📝 Record types: ${file.recordTypes.map(r => r.name).join(', ')}`);
+  protected createStream(filename: string, file: FeedFile, tables: any): SnowflakeStream {
+    return new SnowflakeStream(filename, file, tables);
+  }
 
-    for (const record of file.recordTypes) {
-      // If tableNames is specified, only create table objects for those specific tables
-      if (tableNames && !tableNames.includes(record.name)) {
-        console.log(`      ⏭️  Skipping table object creation for: ${record.name} (not in requested tables: ${tableNames.join(', ')})`);
-        continue;
-      }
+  /**
+   * Create the Snowflake table
+   */
+  protected createTable(db: DatabaseConnection, record: Record): SnowflakeTable {
+    return new SnowflakeTable(
+      db,
+      record.name,
+      process.env.SNOWFLAKE_SCHEMA!,
+      process.env.DATABASE_NAME!,
+      5000,
+      record
+    );
+  }
 
-      if (!index[record.name]) {
-        const db = record.orderedInserts ? await this.db.getConnection() : this.db;
-        console.log(`      🏗️  Creating Snowflake table object for: ${record.name}`);
-        index[record.name] = new SnowflakeTable(
-          db,
-          record.name,
-          process.env.SNOWFLAKE_SCHEMA!,
-          process.env.DATABASE_NAME!,
-          5000,
-          record
-        );
-      }
-    }
+  /**
+   * Get schemas for a given file using Snowflake-specific schema implementation
+   */
+  protected schemas(file: FeedFile): SnowflakeSchema[] {
+    return file.recordTypes.map(record => 
+      new SnowflakeSchema(
+        this.db, 
+        record, 
+        process.env.SNOWFLAKE_SCHEMA!, 
+        process.env.DATABASE_NAME!
+      )
+    );
+  }
 
-    return index;
+  /**
+   * Get the Snowflake schema class
+   */
+  protected getSchemaClass(): any {
+    return SnowflakeSchema;
+  }
+
+  /**
+   * Get the Snowflake last processed schema class
+   */
+  protected async getLastProcessedSchemaClass(): Promise<any> {
+    return SnowflakeSchema;
+  }
+
+  /**
+   * Set the last schedule ID for Snowflake
+   */
+  protected async setLastScheduleId(): Promise<void> {
+    // Snowflake-specific implementation for setting last schedule ID
+    console.log(`      🆔 Setting last schedule ID for Snowflake...`);
+    // TODO: Implement Snowflake-specific logic
+  }
+
+  /**
+   * Remove orphan stop times for Snowflake
+   */
+  protected async removeOrphanStopTimes() {
+    // Snowflake-specific implementation for removing orphan stop times
+    console.log(`      🧹 Removing orphan stop times for Snowflake...`);
+    // TODO: Implement Snowflake-specific logic
+  }
+
+  /**
+   * Update the last file processed for Snowflake
+   */
+  protected async updateLastFile(filename: string): Promise<void> {
+    // Snowflake-specific implementation for updating last file
+    console.log(`      📝 Updating last file processed for Snowflake: ${filename}`);
+    // TODO: Implement Snowflake-specific logic
   }
 } 

@@ -5,7 +5,9 @@ import sinonChai from "sinon-chai";
 import { Container } from "@cli/Container";
 import { SnowflakeConnection } from "@database/SnowflakeConnection";
 import { ShowHelpCommand } from "@cli/ShowHelpCommand";
-import { ImportFeedCommand } from "@cli/ImportFeedCommand";
+import { BaseImportFeedCommand } from "@cli/BaseImportFeedCommand";
+import { MySQLImportFeedCommand } from "@cli/MySQLImportFeedCommand";
+import { SnowflakeImportFeedCommand } from "@cli/SnowflakeImportFeedCommand";
 import { OutputGTFSCommand } from "@cli/OutputGTFSCommand";
 import { DownloadCommand } from "@cli/DownloadCommand";
 import * as PromiseSFTP from "@src/sftp/PromiseSFTP";
@@ -70,7 +72,14 @@ describe("Container", () => {
 
     it("should return appropriate command for --fares", async () => {
       const command = await container.getCommand("--fares");
-      expect(command).to.be.instanceOf(ImportFeedCommand);
+      expect(command).to.be.instanceOf(BaseImportFeedCommand);
+      
+      // Check for the appropriate database-specific implementation
+      if (process.env.DATABASE_TYPE === 'snowflake') {
+        expect(command).to.be.instanceOf(SnowflakeImportFeedCommand);
+      } else {
+        expect(command).to.be.instanceOf(MySQLImportFeedCommand);
+      }
     });
 
     it("should return appropriate command for --gtfs", async () => {

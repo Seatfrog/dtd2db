@@ -3,7 +3,8 @@ import * as fs from 'node:fs';
 import * as os from 'node:os';
 import * as path from 'node:path';
 import {CLICommand} from "@cli/CLICommand";
-import {ImportFeedCommand} from "@cli/ImportFeedCommand";
+import {BaseImportFeedCommand} from "@cli/BaseImportFeedCommand";
+import {MySQLImportFeedCommand} from "@cli/MySQLImportFeedCommand";
 import {DatabaseConfiguration, DatabaseConnection} from "@database/DatabaseConnection";
 import config from "@config/index";
 import {CleanFaresCommand} from "@cli/CleanFaresCommand";
@@ -92,35 +93,35 @@ export class Container {
   }
 
   @memoize
-  public async getFaresImportCommand(): Promise<ImportFeedCommand> {
+  public async getFaresImportCommand(): Promise<BaseImportFeedCommand> {
     if (this.isSnowflake) {
       return new SnowflakeImportFeedCommand(await this.getDatabaseConnection(), config.fares, fs.mkdtempSync(path.join(os.tmpdir(), "dtd")));
     }
-    return new ImportFeedCommand(await this.getDatabaseConnection(), config.fares, fs.mkdtempSync(path.join(os.tmpdir(), "dtd")));
+    return new MySQLImportFeedCommand(await this.getDatabaseConnection(), config.fares, fs.mkdtempSync(path.join(os.tmpdir(), "dtd")));
   }
 
   @memoize
-  public async getRouteingImportCommand(): Promise<ImportFeedCommand> {
+  public async getRouteingImportCommand(): Promise<BaseImportFeedCommand> {
     if (this.isSnowflake) {
       return new SnowflakeImportFeedCommand(await this.getDatabaseConnection(), config.routeing, fs.mkdtempSync(path.join(os.tmpdir(), "dtd")));
     }
-    return new ImportFeedCommand(await this.getDatabaseConnection(), config.routeing, fs.mkdtempSync(path.join(os.tmpdir(), "dtd")));
+    return new MySQLImportFeedCommand(await this.getDatabaseConnection(), config.routeing, fs.mkdtempSync(path.join(os.tmpdir(), "dtd")));
   }
 
   @memoize
-  public async getTimetableImportCommand(): Promise<ImportFeedCommand> {
+  public async getTimetableImportCommand(): Promise<BaseImportFeedCommand> {
     if (this.isSnowflake) {
       return new SnowflakeImportFeedCommand(await this.getDatabaseConnection(), config.timetable, fs.mkdtempSync(path.join(os.tmpdir(), "dtd")));
     }
-    return new ImportFeedCommand(await this.getDatabaseConnection(), config.timetable, fs.mkdtempSync(path.join(os.tmpdir(), "dtd")));
+    return new MySQLImportFeedCommand(await this.getDatabaseConnection(), config.timetable, fs.mkdtempSync(path.join(os.tmpdir(), "dtd")));
   }
 
   @memoize
-  public async getNFM64ImportCommand(): Promise<ImportFeedCommand> {
+  public async getNFM64ImportCommand(): Promise<BaseImportFeedCommand> {
     if (this.isSnowflake) {
       return new SnowflakeImportFeedCommand(await this.getDatabaseConnection(), config.nfm64, fs.mkdtempSync(path.join(os.tmpdir(), "dtd")));
     }
-    return new ImportFeedCommand(await this.getDatabaseConnection(), config.nfm64, fs.mkdtempSync(path.join(os.tmpdir(), "dtd")));
+    return new MySQLImportFeedCommand(await this.getDatabaseConnection(), config.nfm64, fs.mkdtempSync(path.join(os.tmpdir(), "dtd")));
   }
 
   @memoize
@@ -180,7 +181,7 @@ export class Container {
   }
 
   @memoize
-  private async getDownloadAndProcessCommand(path: string, process: Promise<ImportFeedCommand>): Promise<DownloadAndProcessCommand> {
+  private async getDownloadAndProcessCommand(path: string, process: Promise<BaseImportFeedCommand>): Promise<DownloadAndProcessCommand> {
     return new DownloadAndProcessCommand(await this.getDownloadCommand(path), await process);
   }
 
