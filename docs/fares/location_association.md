@@ -1,9 +1,17 @@
 # Location Associations
 
-**Description:**  
-Defines associations between different locations (stations). This allows one location to be linked to another, typically for fare calculation purposes where certain stations are treated as equivalent or grouped together.
+**Config file:**
+LOC.ts
 
-## Location Association Record
+**Snowflake table name:**
+location_association
+
+**Description:**  
+Defines associations between different locations (stations). This allows one location to be linked to another, typically for fare calculation purposes where certain stations are treated as equivalent or grouped together. Within PMS the capability of creating these records is deprecated and no records exist in the data.
+
+**Rate of change:** Approximately 12 times per month.
+
+## A – Location Association Record
 
 | Field Name | Description |
 |------------|-------------|
@@ -16,4 +24,12 @@ Defines associations between different locations (stations). This allows one loc
 
 ## Relationships
 - `UIC_CODE` links to the main `location` table.
-- `ASSOC_UIC_CODE` links to another record in the `location` table. 
+- `ASSOC_UIC_CODE` links to another record in the `location` table.
+
+## File Information
+- **File Type:** Fixed-width text file
+- **Filename Pattern:** RJFAtnnn.LOC
+- **Typical Size:** 1Kb (full file)
+- **Update Frequency:** Available as 'changes only' updates
+- **Record Type:** Multi-record type file (A records within LOC file)
+- **Note:** These records are deprecated and no records exist in the data. 

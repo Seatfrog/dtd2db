@@ -1,5 +1,11 @@
 # Fare
 
+**Config file:**
+FFL.ts
+
+**Snowflake table name:**
+fare
+
 **Description:**  
 Fare records are linked to the associated flow record using the FLOW_ID field. These records define the actual fare amounts for specific flows and ticket types.
 

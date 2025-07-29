@@ -1,5 +1,11 @@
 # Ticket Types
 
+**Config file:**
+TTY.ts
+
+**Snowflake table name:**
+ticket_type
+
 **Description:**  
 This file contains details of all the ticket codes included in the flow file and the non-derivable fares overrides file.
 
@@ -45,4 +51,11 @@ This file contains details of all the ticket codes included in the flow file and
 - `TICKET_CODE` is referenced in `fare` table fare records.
 - `VALIDITY_CODE` links to `ticket_validity` table.
 - `CAPRI_CODE` may link to CAPRI system definitions.
-- Referenced by various restriction tables for ticket-specific restrictions. 
+- Referenced by various restriction tables for ticket-specific restrictions.
+
+## File Information
+- **File Type:** Fixed-width text file
+- **Filename Pattern:** RJFAtnnn.TTY
+- **Typical Size:** 5Kb (full file)
+- **Update Frequency:** Available as 'changes only' updates
+- **Record Type:** Single record type file 

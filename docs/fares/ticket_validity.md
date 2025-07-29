@@ -1,5 +1,11 @@
 # Ticket Validity
 
+**Config file:**
+TVL.ts
+
+**Snowflake table name:**
+ticket_validity
+
 **Description:**  
 This file contains details of the validity periods for particular ticket types.
 
@@ -23,9 +29,16 @@ This file contains details of the validity periods for particular ticket types.
 | RET_AFTER_MONTHS | Numeric value 0-12. Indicates the number of months which must elapse before a return journey is permitted, from the outward travel date. |
 | RET_AFTER_DAY | Permitted values are 'MO', 'TU', 'WE', 'TH', 'FR', 'SA', 'SU' or spaces. Indicates that return travel is not permitted until the day specified has passed. Spaces indicate that this is not relevant. |
 | BREAK_OUT | Indicates whether a break of journey is permitted on the outward journey. Permitted values are 'Y' or 'N'. |
-| BREAK_IN | Indicates whether a break of journey is permitted on the return journey. Permitted values are 'Y' or 'N'. |
+| BREAK_RTN | Indicates whether a break of journey is permitted on the return journey. Permitted values are 'Y' or 'N'. |
 | OUT_DESCRIPTION | Short description of outward validity, printed on the ticket. Spaces permitted. |
 | RTN_DESCRIPTION | Short description of return validity, printed on the ticket. Spaces permitted. |
 
 ## Relationships
-- `VALIDITY_CODE` is referenced in ticket type definitions and fare calculations. 
+- `VALIDITY_CODE` is referenced in ticket type definitions and fare calculations.
+
+## File Information
+- **File Type:** Fixed-width text file
+- **Filename Pattern:** RJFAtnnn.TVL
+- **Typical Size:** 1Kb (full file)
+- **Update Frequency:** Available as 'changes only' updates
+- **Record Type:** Single record type file 

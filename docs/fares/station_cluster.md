@@ -1,5 +1,11 @@
 # Station Clusters
 
+**Config file:**
+FSC.ts
+
+**Snowflake table name:**
+station_cluster
+
 **Description:**  
 Cluster codes, and the stations included in the station cluster.
 
@@ -18,4 +24,11 @@ Cluster codes, and the stations included in the station cluster.
 ## Relationships
 - `CLUSTER_ID` is used as the NLC code in `flow` table for origin and destination codes.
 - `CLUSTER_NLC` links to `location` table via NLC codes.
-- Multiple cluster records can exist for the same `CLUSTER_ID`, representing different member stations. 
+- Multiple cluster records can exist for the same `CLUSTER_ID`, representing different member stations.
+
+## File Information
+- **File Type:** Fixed-width text file
+- **Filename Pattern:** RJFAtnnn.FSC
+- **Typical Size:** 1Kb (full file)
+- **Update Frequency:** Available as 'changes only' updates
+- **Record Type:** Single record type file 
