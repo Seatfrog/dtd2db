@@ -1,5 +1,11 @@
 # Restriction Header
 
+**Config file:**
+RST.ts
+
+**Snowflake table name:**
+restriction_header
+
 **Description:**  
 Part of the RESTRICTIONS file which contains the restriction information. The file includes 19 record types, including those for the ticket/supplement calendars (i.e. those things restricted by date).
 
@@ -47,4 +53,11 @@ The RESTRICTIONS file contains 19 record types:
 ## Relationships
 - `RESTRICTION_CODE` is referenced in `flow` table fare records.
 - Links to various restriction detail tables (dates, times, trains, etc.) via the `RESTRICTION_CODE` field.
-- `CF_MKR` links to restriction date records for validity periods. 
+- `CF_MKR` links to restriction date records for validity periods.
+
+## File Information
+- **File Type:** Fixed-width text file
+- **Filename Pattern:** RJFAtnnn.RST
+- **Typical Size:** 1Kb (full file)
+- **Update Frequency:** Available as 'changes only' updates
+- **Record Type:** Multi-record type file (RH records within RST file) 

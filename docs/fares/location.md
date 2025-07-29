@@ -1,11 +1,17 @@
 # Location
 
+**Config file:**
+LOC.ts
+
+**Snowflake table name:**
+location
+
 **Description:**  
 This file holds details of locations. It contains 6 record types: 'Location' records, 'Associated Stations' records, 'Railcard Geography' records, 'TT Group Location' records, 'Group Members' records and 'Synonym' records.
 
 **Rate of change:** Approximately 12 times per month.
 
-## Location Record
+## L – Location Record
 
 | Field Name | Description |
 |------------|-------------|
@@ -52,20 +58,16 @@ This file holds details of locations. It contains 6 record types: 'Location' rec
 | UTS_SOUTH | Used for LUL magnetic stripe encoding. |
 | UTS_WEST | Used for LUL magnetic stripe encoding. |
 
-## Associated Stations Record
-Within PMS the capability of creating these records is deprecated and no records exist in the data.
+## Related Record Types
 
-## Railcard Geography Record
-These records are linked to the associated Location record using the UIC_CODE and END_DATE fields.
+The LOCATIONS file contains 6 record types:
 
-## TT Group Location Record
-These records are linked to the associated Location record using the UIC_CODE and END_DATE fields.
-
-## Group Members Record
-These records are linked to the associated TT Group Location record using the UIC_CODE and END_DATE fields.
-
-## Synonym Record
-These records are linked to the associated Location record using the UIC_CODE and END_DATE fields.
+1. **L** – Location record (this table)
+2. **A** – Associated Stations record (deprecated)
+3. **R** – Railcard Geography record
+4. **G** – Location Group record
+5. **M** – Group Members record
+6. **S** – Synonym record
 
 ## Relationships
 - `UIC_CODE` is the primary identifier used across the fares system.
@@ -73,4 +75,11 @@ These records are linked to the associated Location record using the UIC_CODE an
 - `CRS_CODE` provides standard station codes.
 - Links to `location_association`, `location_railcard`, `location_group_member`, and `location_synonym` tables.
 - Referenced by `flow` table for origin and destination codes.
-- Used in restriction tables for route definitions. 
+- Used in restriction tables for route definitions.
+
+## File Information
+- **File Type:** Fixed-width text file
+- **Filename Pattern:** RJFAtnnn.LOC
+- **Typical Size:** 1Kb (full file)
+- **Update Frequency:** Available as 'changes only' updates
+- **Record Type:** Multi-record type file (L records within LOC file) 

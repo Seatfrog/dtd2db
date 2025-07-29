@@ -1,5 +1,11 @@
 # Rail Rovers
 
+**Config file:**
+TRR.ts
+
+**Snowflake table name:**
+rover
+
 **Description:**  
 Defines rover tickets (special tickets for unlimited travel in a region) with their validity periods and travel rules.
 
