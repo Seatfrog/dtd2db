@@ -161,21 +161,16 @@ export abstract class BaseImportFeedCommand implements CLICommand {
   }
 
   /**
-   * Convert table names to file extensions using the mapping
+   * Convert table names to file extensions using the mapping.
    */
   private convertTableNamesToFileTypes(tableNames: string[]): string[] {
-    const fileTypes = new Set<string>();
-    
-    for (const tableName of tableNames) {
-      const fileType = TABLE_TO_FILE_MAPPING[tableName];
-      if (fileType) {
-        fileTypes.add(fileType);
-      } else {
-        console.warn(`Warning: Unknown table name '${tableName}'. Available tables: ${Object.keys(TABLE_TO_FILE_MAPPING).join(', ')}`);
-      }
+    const unknownTables = tableNames.filter(tableName => !TABLE_TO_FILE_MAPPING[tableName]);
+
+    if (unknownTables.length > 0) {
+      throw new Error(`Unknown table name(s): ${unknownTables.join(', ')}. Available tables: ${Object.keys(TABLE_TO_FILE_MAPPING).join(', ')}`);
     }
-    
-    return Array.from(fileTypes);
+
+    return Array.from(new Set(tableNames.map(tableName => TABLE_TO_FILE_MAPPING[tableName])));
   }
 
   /**
@@ -420,4 +415,4 @@ export abstract class BaseImportFeedCommand implements CLICommand {
   public end(): Promise<void> {
     return this.db.end();
   }
-} 
+}
