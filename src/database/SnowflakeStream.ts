@@ -32,7 +32,8 @@ export class SnowflakeStream extends Writable {
         table.getDatabaseName(),
         table.getFlushLimit(),
         record,
-        this.logger
+        this.logger,
+        table.isInsertOnly()
       );
     }
     return tableIndex;

@@ -23,11 +23,12 @@ export class SnowflakeTableFactory {
     databaseName: string,
     flushLimit: number = 5000,
     record?: FeedRecord,
-    logger?: Logger
+    logger?: Logger,
+    insertOnly: boolean = false
   ): SnowflakeTable {
     const key = `${databaseName}.${schemaName}.${tableName}`;
     if (!this.tableCache.has(key)) {
-      this.tableCache.set(key, new SnowflakeTable(db, tableName, schemaName, databaseName, flushLimit, record, logger));
+      this.tableCache.set(key, new SnowflakeTable(db, tableName, schemaName, databaseName, flushLimit, record, logger, insertOnly));
     }
     return this.tableCache.get(key)!;
   }
