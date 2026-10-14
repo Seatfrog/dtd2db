@@ -15,7 +15,7 @@ const readFile = filename => byline.createStream(fs.createReadStream(filename, "
 /**
  * Mapping from table names to file extensions for fares data
  */
-const TABLE_TO_FILE_MAPPING: { [key: string]: string } = {
+export const TABLE_TO_FILE_MAPPING: { [key: string]: string } = {
   // TOC file
   'toc': 'TOC',
   'toc_fare': 'TOC',
@@ -75,11 +75,11 @@ const TABLE_TO_FILE_MAPPING: { [key: string]: string } = {
   // TCL file
   'ticket_class': 'TCL',
   // TJS file
-  'ticket_journey': 'TJS',
+  'ticket_journey_status': 'TJS',
   // TPN file
   'ticket_price_network': 'TPN',
   // TSP file
-  'ticket_supplement': 'TSP',
+  'toc_specific_ticket': 'TSP',
   // FSC file
   'station_cluster': 'FSC',
   // FRR file
