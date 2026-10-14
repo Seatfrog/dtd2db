@@ -221,6 +221,8 @@ export abstract class BaseImportFeedCommand implements CLICommand {
     } catch (error) {
       console.error(`\n❌ IMPORT FAILED:`, error);
       throw error;
+    } finally {
+      fs.rmSync(this.tmpFolder, { recursive: true, force: true });
     }
   }
 
