@@ -120,15 +120,13 @@ export class SnowflakeTable {
         return;
       case RecordAction.Delete:
         this.logger.debug('=== Processing DELETE ===');
-        // Use the exact DELETE pattern expected by the test
-        const deleteSQL = `DELETE FROM ${this.databaseName}.${this.schemaName}.${this.tableName.toUpperCase()} WHERE ${this.getDeleteWhereSQL(rows[0])}`;
-        // For delete, pass the key values as parameters in the same order as in the WHERE clause
-        const deleteParams = Object.entries(rows[0].keysValues)
-          .filter(([key]) => !this.isIdField(key))
-          .map(([key, value]) => value);
+        // Delete every buffered row in one statement, using the same JSON source and key match as the other MERGEs.
+        // Only the key columns are needed to find the rows.
+        const deleteSQL = this.getMergeDeleteSQL(rows[0]);
+        const deleteKeyValues = JSON.stringify(rows.map(r => this.getKeyValues(r)));
         this.logger.debug('Generated DELETE SQL: ' + deleteSQL);
-        this.logger.debug('Executing DELETE query with: ' + deleteSQL + ' | params: ' + JSON.stringify(deleteParams));
-        await this.retryQuery(() => this.db.query(deleteSQL, deleteParams));
+        this.logger.debug('Executing DELETE query with: ' + deleteSQL + ' | params: ' + JSON.stringify([deleteKeyValues]));
+        await this.retryQuery(() => this.db.query(deleteSQL, [deleteKeyValues]));
         return;
       default:
         this.logger.debug('Unknown record action: ' + type);
@@ -171,12 +169,19 @@ export class SnowflakeTable {
       .join(', ');
   }
 
-  private getDeleteWhereSQL(row: ParsedRecord): string {
-    // Ensure the order of keys matches the order of parameters
-    return Object.entries(row.keysValues)
-      .filter(([key]) => !this.isIdField(key))
-      .map(([key, value]) => `${key.toUpperCase()} = ?`)
-      .join(' AND ');
+  private getKeyValues(row: ParsedRecord): Record<string, any> {
+    const obj: Record<string, any> = {};
+    for (const [k, v] of Object.entries(row.keysValues)) {
+      if (!this.isIdField(k)) obj[k.toUpperCase()] = v;
+    }
+    return obj;
+  }
+
+  private getMergeDeleteSQL(sampleRow: ParsedRecord): string {
+    return `MERGE INTO ${this.getFullTableName()} target
+   USING (SELECT * FROM TABLE(FLATTEN(input => parse_json(?)))) source
+   ON ${this.getMergeKeySQL(sampleRow)}
+   WHEN MATCHED THEN DELETE`;
   }
 
   private getFullTableName(): string {
