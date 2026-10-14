@@ -169,13 +169,43 @@ describe("SnowflakeTable", () => {
     };
     await table.apply(row);
     const deleteMatched = mockDb.query.getCalls().some(call =>
-      typeof call.args[0] === 'string' && call.args[0].startsWith("DELETE FROM TEST_DB.TEST_SCHEMA.TEST_TABLE WHERE")
+      typeof call.args[0] === 'string' && call.args[0].endsWith("WHEN MATCHED THEN DELETE")
     );
     const mergeMatched = mockDb.query.getCalls().some(call =>
       typeof call.args[0] === 'string' && call.args[0].includes("MERGE INTO TEST_DB.TEST_SCHEMA.TEST_TABLE target")
     );
     expect(deleteMatched).to.be.true;
     expect(mergeMatched).to.be.true;
+  });
+
+  it("should delete every buffered row, not just the first in each flush", async () => {
+    const deleteRow = (code: string) => ({
+      action: RecordAction.Delete,
+      values: { VALIDITY_CODE: code, END_DATE: "2024-12-31", DESCRIPTION: "ignored" },
+      keysValues: { VALIDITY_CODE: code, END_DATE: "2024-12-31" }
+    });
+
+    // The flush limit is 2, so this flushes V1 and V2 together, then V3 on close
+    await table.apply(deleteRow("V1"));
+    await table.apply(deleteRow("V2"));
+    await table.apply(deleteRow("V3"));
+    await table.close();
+
+    const deleteCalls = mockDb.query.getCalls().filter(call =>
+      typeof call.args[0] === 'string' && call.args[0].endsWith("WHEN MATCHED THEN DELETE")
+    );
+
+    expect(deleteCalls).to.have.length(2);
+    expect(deleteCalls[0].args[0]).to.equal(
+      `MERGE INTO TEST_DB.TEST_SCHEMA.TEST_TABLE target
+   USING (SELECT * FROM TABLE(FLATTEN(input => parse_json(?)))) source
+   ON target.VALIDITY_CODE = source.value:VALIDITY_CODE AND target.END_DATE = source.value:END_DATE
+   WHEN MATCHED THEN DELETE`
+    );
+    expect(deleteCalls.map(call => JSON.parse(call.args[1][0]))).to.deep.equal([
+      [{ VALIDITY_CODE: "V1", END_DATE: "2024-12-31" }, { VALIDITY_CODE: "V2", END_DATE: "2024-12-31" }],
+      [{ VALIDITY_CODE: "V3", END_DATE: "2024-12-31" }]
+    ]);
   });
 
   it("should log and do nothing if the table already exists", async () => {
