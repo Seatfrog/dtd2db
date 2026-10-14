@@ -24,7 +24,8 @@ export class SnowflakeTable {
     private readonly databaseName: string,
     private readonly flushLimit: number = 5000,
     private readonly record?: FeedRecord,
-    logger?: Logger
+    logger?: Logger,
+    private readonly insertOnly: boolean = false
   ) {
     this.logger = logger || Logger.getInstance();
     this.logger.debug('=== CONSTRUCTOR START ===');
@@ -35,7 +36,7 @@ export class SnowflakeTable {
     this.logger.debug(`Flush limit: ${flushLimit}`);
     
     if (record) {
-      this.schema = new SnowflakeSchema(db, record, schemaName, databaseName, logger);
+      this.schema = new SnowflakeSchema(db, record, schemaName, databaseName, logger, tableName);
     }
   }
 
@@ -101,7 +102,8 @@ export class SnowflakeTable {
     switch (type) {
       case RecordAction.Insert:
         this.logger.debug('=== Processing INSERT ===');
-        const insertSQL = this.getMergeSQL(rows[0]);
+        // A full refresh loads into a new, empty table, where a MERGE would only slow down as the table grows
+        const insertSQL = this.insertOnly ? this.getInsertSQL(rows[0]) : this.getMergeSQL(rows[0]);
         this.logger.debug('Generated INSERT SQL: ' + insertSQL);
         this.logger.debug('Executing query with: ' + insertSQL + ' | params: ' + JSON.stringify([JSON.stringify(rowValues)]));
         await this.retryQuery(() => this.db.query(insertSQL, [JSON.stringify(rowValues)]));
@@ -198,6 +200,14 @@ export class SnowflakeTable {
    USING (SELECT * FROM TABLE(FLATTEN(input => parse_json(?)))) source
    ON ${mergeKeySQL}
    WHEN NOT MATCHED THEN INSERT (${columnList.join(', ')}) VALUES (${sourceColumnList.join(', ')})`;
+  }
+
+  private getInsertSQL(sampleRow: ParsedRecord): string {
+    const columnList = this.getColumnList(sampleRow).map(col => col.toUpperCase());
+    const sourceColumnList = this.getSourceColumnList(sampleRow);
+
+    return `INSERT INTO ${this.getFullTableName()} (${columnList.join(', ')})
+   SELECT ${sourceColumnList.join(', ')} FROM TABLE(FLATTEN(input => parse_json(?))) source`;
   }
 
   // Retry helper for transient errors
@@ -334,5 +344,9 @@ export class SnowflakeTable {
 
   public getFlushLimit(): number {
     return this.flushLimit;
+  }
+
+  public isInsertOnly(): boolean {
+    return this.insertOnly;
   }
 } 

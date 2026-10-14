@@ -17,7 +17,8 @@ export class SnowflakeSchema implements DatabaseSchema {
     private readonly record: Record,
     private readonly schemaName: string,
     private readonly databaseName: string,
-    logger?: Logger
+    logger?: Logger,
+    private readonly tableName: string = record.name
   ) {
     this.logger = logger || Logger.getInstance();
     this.logger.debug(`SnowflakeSchema initialized for record: ${record.name} in database: ${databaseName}, schema: ${schemaName}`);
@@ -25,14 +26,22 @@ export class SnowflakeSchema implements DatabaseSchema {
 
   public createSchema(): Promise<any> {
     const schema = this.getSchema();
-    this.logger.debug(`Creating schema for ${this.record.name}`);
+    this.logger.debug(`Creating schema for ${this.tableName}`);
     this.logger.debug(`Schema SQL: ${schema}`);
     return this.db.query(schema);
   }
 
+  /**
+   * Create a transient table for loading a full refresh. It has no fail-safe storage, as it only lives until the
+   * load is copied into the live table.
+   */
+  public createTransientSchema(): Promise<any> {
+    return this.db.query(this.getSchema("CREATE TRANSIENT TABLE"));
+  }
+
   public dropSchema(): Promise<any> {
-    this.logger.debug(`Dropping schema for ${this.record.name}`);
-    return this.db.query(`DROP TABLE IF EXISTS ${this.databaseName}.${this.schemaName}.${this.record.name.toUpperCase()}`);
+    this.logger.debug(`Dropping schema for ${this.tableName}`);
+    return this.db.query(`DROP TABLE IF EXISTS ${this.databaseName}.${this.schemaName}.${this.tableName.toUpperCase()}`);
   }
 
   public async tableExists(): Promise<boolean> {
@@ -40,22 +49,22 @@ export class SnowflakeSchema implements DatabaseSchema {
       SELECT COUNT(*) as count 
       FROM INFORMATION_SCHEMA.TABLES 
       WHERE TABLE_SCHEMA = '${this.schemaName}' 
-      AND TABLE_NAME = '${this.record.name.toUpperCase()}'
+      AND TABLE_NAME = '${this.tableName.toUpperCase()}'
     `;
     const result = await this.db.query(query) as [any[], any];
     const rows = result[0];
     return rows[0]?.count > 0;
   }
 
-  private getSchema(): string {
+  private getSchema(createStatement: string = "CREATE TABLE IF NOT EXISTS"): string {
     const fields = Object.entries(this.record.fields)
       .map(SnowflakeSchema.getField)
       .join(', ');
     const unique = this.record.key.length === 0 
       ? "" 
-      : `CONSTRAINT ${this.record.name.toUpperCase()}_KEY UNIQUE (${this.record.key.map(k => k.toUpperCase()).join(', ')})`;
+      : `CONSTRAINT ${this.tableName.toUpperCase()}_KEY UNIQUE (${this.record.key.map(k => k.toUpperCase()).join(', ')})`;
     const table = [fields, unique].filter(Boolean).join(', ');
-    const sql = `CREATE TABLE IF NOT EXISTS ${this.databaseName}.${this.schemaName}.${this.record.name.toUpperCase()} (${table})`;
+    const sql = `${createStatement} ${this.databaseName}.${this.schemaName}.${this.tableName.toUpperCase()} (${table})`;
     this.logger.debug(`[SnowflakeSchema] record.key: ${JSON.stringify(this.record.key)}`);
     this.logger.debug(`[SnowflakeSchema] Final CREATE TABLE SQL: ${sql}`);
     return sql;

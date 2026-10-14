@@ -41,7 +41,8 @@ describe("SnowflakeStream", () => {
         getTableName: () => "table1",
         getSchemaName: () => "TEST_SCHEMA",
         getDatabaseName: () => "TEST_DB",
-        getFlushLimit: () => 2
+        getFlushLimit: () => 2,
+        isInsertOnly: () => false
       },
       table2: {
         ensureExists: sinon.stub().resolves(),
@@ -50,7 +51,8 @@ describe("SnowflakeStream", () => {
         getTableName: () => "table2",
         getSchemaName: () => "TEST_SCHEMA",
         getDatabaseName: () => "TEST_DB",
-        getFlushLimit: () => 2
+        getFlushLimit: () => 2,
+        isInsertOnly: () => false
       }
     };
     mockLogger = setupMockLogger();
