@@ -132,7 +132,7 @@ describe("SnowflakeTable", () => {
     expect(mockDb.query).to.have.been.calledWith(
       `MERGE INTO TEST_DB.TEST_SCHEMA.TEST_TABLE target
    USING (SELECT * FROM TABLE(FLATTEN(input => parse_json(?)))) source
-   ON target.VALIDITY_CODE = source.value:VALIDITY_CODE AND target.END_DATE = source.value:END_DATE
+   ON EQUAL_NULL(target.VALIDITY_CODE, source.value:VALIDITY_CODE::VARCHAR) AND EQUAL_NULL(target.END_DATE, source.value:END_DATE::VARCHAR)
    WHEN NOT MATCHED THEN INSERT (VALIDITY_CODE, END_DATE, NAME) VALUES (source.value:validity_code, source.value:end_date, source.value:name)`,
       ['[{"VALIDITY_CODE":"V1","END_DATE":"2024-12-31","NAME":"test1"},{"VALIDITY_CODE":"V2","END_DATE":"2024-12-31","NAME":"test2"}]']
     );
@@ -199,7 +199,7 @@ describe("SnowflakeTable", () => {
     expect(deleteCalls[0].args[0]).to.equal(
       `MERGE INTO TEST_DB.TEST_SCHEMA.TEST_TABLE target
    USING (SELECT * FROM TABLE(FLATTEN(input => parse_json(?)))) source
-   ON target.VALIDITY_CODE = source.value:VALIDITY_CODE AND target.END_DATE = source.value:END_DATE
+   ON EQUAL_NULL(target.VALIDITY_CODE, source.value:VALIDITY_CODE::VARCHAR) AND EQUAL_NULL(target.END_DATE, source.value:END_DATE::VARCHAR)
    WHEN MATCHED THEN DELETE`
     );
     expect(deleteCalls.map(call => JSON.parse(call.args[1][0]))).to.deep.equal([

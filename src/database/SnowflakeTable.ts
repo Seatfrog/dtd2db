@@ -160,7 +160,7 @@ export class SnowflakeTable {
   private getMergeKeySQL(row: ParsedRecord): string {
     return Object.entries(row.keysValues)
       .filter(([key]) => !this.isIdField(key))
-      .map(([key, value]) => `target.${key.toUpperCase()} = source.value:${key.toUpperCase()}`)
+      .map(([key, value]) => `EQUAL_NULL(target.${key.toUpperCase()}, source.value:${key.toUpperCase()}::VARCHAR)`)
       .join(' AND ');
   }
 
