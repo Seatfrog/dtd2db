@@ -39,6 +39,24 @@ describe("Snowflake fares config", () => {
     });
   });
 
+  describe("LOC", () => {
+    it("reads the admin area code and the fields around it", () => {
+      const line = "RL700041002092026080820262002202470 0041BOUNDARY ZONE 2 QAK00000     0041  00GL      07BOUNDARY ZONE 2"
+        + " ".repeat(26) + "BOUNDARY ZONE 2 BOUNDARY ZONE 2" + " ".repeat(45) + "BOUNDARY ZONE 2" + " ".repeat(41)
+        + "2 NNNNNN0009000S0000000000000";
+      const record = snowflake.LOC.getRecord(line)!;
+
+      expect(record.name).to.equal("location");
+      expect(record.extractValues(line).values).to.deep.include({
+        QUOTE_DATE: "20022024",
+        AREA_ADMIN_CODE: "70",
+        NLC: "0041",
+        DESCRIPTION: "BOUNDARY ZONE 2",
+        CRS: "QAK"
+      });
+    });
+  });
+
   describe("SUP", () => {
     it("keeps * in supplement rule flags and stores a space as null", () => {
       const line = "RR001311229992805202525082023" + " ".repeat(46) + "2**** **BARSINR";
