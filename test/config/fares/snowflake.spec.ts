@@ -39,4 +39,26 @@ describe("Snowflake fares config", () => {
     });
   });
 
+  describe("SUP", () => {
+    it("keeps * in supplement rule flags and stores a space as null", () => {
+      const line = "RR001311229992805202525082023" + " ".repeat(46) + "2**** **BARSINR";
+      const record = snowflake.SUP.getRecord(line)!;
+
+      expect(record.name).to.equal("supplement_rule");
+      expect(record.extractValues(line).values).to.deep.include({
+        FARE_CLASS: "2",
+        QUOTA: "*",
+        WEEKEND_FIRST: "*",
+        SILVER_STANDARD: "*",
+        RAILCARD: "*",
+        CATERING_CODE: null,
+        SLEEPER: "*",
+        ACCOM_CLASS: "*",
+        STATUS: "B",
+        RESERVATION_STATUS: "ARS",
+        SECTORS: "INR"
+      });
+    });
+  });
+
 });
