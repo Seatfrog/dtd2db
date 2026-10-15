@@ -1,7 +1,6 @@
 import {SnowflakeFixedWidthRecord} from "@feed/record/snowflake/FixedWidthRecord";
 import {MultiRecordFile} from "@feed/file/MultiRecordFile";
 import {TrimmedTextField} from "@feed/field/TextField";
-import {RecordAction} from "@feed/record/Record";
 
 const statusDiscount = new SnowflakeFixedWidthRecord(
   "status_discount",
@@ -12,13 +11,6 @@ const statusDiscount = new SnowflakeFixedWidthRecord(
     "discount_category": new TrimmedTextField(12, 2, true),
     "discount_indicator": new TrimmedTextField(14, 1, true),
     "discount_percentage": new TrimmedTextField(15, 3, true)
-  },
-  [],
-  {
-    "I": RecordAction.Insert,
-    "A": RecordAction.Update,
-    "D": RecordAction.Delete,
-    "R": RecordAction.Insert
   }
 );
 
@@ -44,13 +36,6 @@ const status = new SnowflakeFixedWidthRecord(
     "fr_mkr": new TrimmedTextField(96, 1, true),
     "ss_mkr": new TrimmedTextField(97, 1, true),
     "sr_mkr": new TrimmedTextField(98, 1, true)
-  },
-  [],
-  {
-    "I": RecordAction.Insert,
-    "A": RecordAction.Update,
-    "D": RecordAction.Delete,
-    "R": RecordAction.Insert
   }
 );
 
