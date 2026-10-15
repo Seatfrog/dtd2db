@@ -57,6 +57,23 @@ describe("Snowflake fares config", () => {
     });
   });
 
+  describe("TJS", () => {
+    it("reads journey segment records", () => {
+      const line = "00731122999230520170580015";
+      const record = snowflake.TJS.getRecord(line)!;
+
+      expect(record.name).to.equal("journey_segment");
+      expect(record.extractValues(line).values).to.deep.equal({
+        JS_CODE: "007",
+        END_DATE: "31122999",
+        START_DATE: "23052017",
+        LINE: "058",
+        SEGMENT_START: "00",
+        SEGMENT_END: "15"
+      });
+    });
+  });
+
   describe("SUP", () => {
     it("keeps * in supplement rule flags and stores a space as null", () => {
       const line = "RR001311229992805202525082023" + " ".repeat(46) + "2**** **BARSINR";
