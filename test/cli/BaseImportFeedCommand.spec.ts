@@ -49,9 +49,9 @@ describe("BaseImportFeedCommand", () => {
     });
 
     it("imports the files for known table names", async () => {
-      await command.run(["node", "index.ts", "--fares", "fares.zip", "--tables", "TICKET_JOURNEY_STATUS", "flow", "fare"]);
+      await command.run(["node", "index.ts", "--fares", "fares.zip", "--tables", "JOURNEY_SEGMENT", "flow", "fare"]);
 
-      expect(doImport).to.have.been.calledOnceWith("fares.zip", ["TJS", "FFL"], ["ticket_journey_status", "flow", "fare"]);
+      expect(doImport).to.have.been.calledOnceWith("fares.zip", ["TJS", "FFL"], ["journey_segment", "flow", "fare"]);
     });
 
     it("rejects unknown table names without importing anything", async () => {

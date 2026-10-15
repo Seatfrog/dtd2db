@@ -75,7 +75,7 @@ export const TABLE_TO_FILE_MAPPING: { [key: string]: string } = {
   // TCL file
   'ticket_class': 'TCL',
   // TJS file
-  'ticket_journey_status': 'TJS',
+  'journey_segment': 'TJS',
   // TPN file
   'ticket_price_network': 'TPN',
   // TSP file
