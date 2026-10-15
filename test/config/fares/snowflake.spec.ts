@@ -49,7 +49,7 @@ describe("Snowflake fares config", () => {
       expect(record.name).to.equal("location");
       expect(record.extractValues(line).values).to.deep.include({
         QUOTE_DATE: "20022024",
-        AREA_ADMIN_CODE: "70",
+        ADMIN_AREA_CODE: "70",
         NLC: "0041",
         DESCRIPTION: "BOUNDARY ZONE 2",
         CRS: "QAK"
