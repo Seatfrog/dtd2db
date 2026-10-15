@@ -15,7 +15,7 @@ const location = new FixedWidthRecord(
     "end_date": new DateField(9, true),
     "start_date": new DateField(17, true),
     "quote_date": new DateField(25, true),
-    "area_admin_code": new TextField(34, 2, true),
+    "area_admin_code": new TextField(33, 3, true),
     "nlc": new TextField(36, 4, true),
     "description": new TextField(40, 16, true),
     "crs": new TextField(56, 3, true),

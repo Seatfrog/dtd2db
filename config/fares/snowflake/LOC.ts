@@ -11,7 +11,7 @@ const location = new SnowflakeFixedWidthRecord(
     "end_date": new TrimmedTextField(9, 8, true),
     "start_date": new TrimmedTextField(17, 8, true),
     "quote_date": new TrimmedTextField(25, 8, true),
-    "area_admin_code": new TrimmedTextField(34, 2, true),
+    "area_admin_code": new TrimmedTextField(33, 3, true),
     "nlc": new TrimmedTextField(36, 4, true),
     "description": new TrimmedTextField(40, 16, true),
     "crs": new TrimmedTextField(56, 3, true),
