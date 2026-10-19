@@ -268,3 +268,9 @@ The following short codes are used in the codebase to represent different record
 
 These codes are used in logging and throughout the codebase for clarity and consistency.
 
+
+## Origin and license
+
+This project started as a fork of [planarnetwork/gb-transit](https://github.com/planarnetwork/gb-transit), written by Linus Norton. The two projects have diverged since. If the DTD file formats change, the upstream project can be a useful place to look for a fix.
+
+The project is licensed under GPL-3.0, the same as the upstream project.
